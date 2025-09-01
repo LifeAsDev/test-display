@@ -63,8 +63,24 @@
         If openfiler.ShowDialog = Windows.Forms.DialogResult.OK Then
             filename = openfiler.FileName
             Dim url = CopyToTempAndGetUrl(openfiler.FileName)
+            Dim rand As New Random()
+            Dim posX As Integer = rand.Next(0, webForm.Width)   ' Puede salir parcialmente
+            Dim posY As Integer = rand.Next(0, webForm.Height)  ' Puede salir parcialmente
 
-            webForm.MostrarSaludo(url)
+            webForm.AgregarObjetoDisplay(
+                     IdGrupo:="grupo1",           ' Identificador de grupo
+                     Id:=Guid.NewGuid().ToString(), ' Identificador único del objeto
+                     Url:=url,                    ' URL del archivo
+                     Ancho:=0,                  ' Ancho en px
+                     Alto:=0,                   ' Alto en px
+                     PosX:=posX,
+                     PosY:=posY,
+                     NivelCapa:=1,                ' Nivel de superposición
+                     Opacidad:=80,                ' Opacidad %
+                     Retraso:=500,                ' Retraso en ms
+                     FadeIn:=500,                 ' FadeIn en ms
+                     FadeOut:=0                ' FadeOut en ms
+                 )
 
         End If
 

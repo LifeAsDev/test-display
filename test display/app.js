@@ -1,42 +1,87 @@
-// Un Map global para guardar los elementos creados
+// Mapa global para manejar los grupos y objetos
 const elementosMap = new Map();
 
-function saludar(url) {
-    const container = document.body;
+function agregarObjetoDisplay(config) {
+    console.log(config);
+    const {
+        IdGrupo,
+        Id,
+        Url,
+        Ancho = 200,
+        Alto = 200,
+        PosX = 0,
+        PosY = 0,
+        NivelCapa = 0,
+        Opacidad = 100,
+        Retraso = 0,
+        FadeIn = 0,
+        FadeOut = 0
+    } = config;
 
-    // Aseguramos que el contenedor tenga posición relativa
+    const container = document.getElementById("image-container") || document.body;
+
     container.style.position = "relative";
+    container.style.width = "100vw";
+    container.style.height = "100vh";
+    container.style.overflow = "hidden";
 
-    // Obtener la extensión del archivo
-    const ext = url.split(".").pop().toLowerCase();
-
+    // Crear el elemento según tipo
+    const ext = Url.split(".").pop().toLowerCase();
     let elemento;
 
     if (["png", "jpg", "jpeg", "gif", "webp"].includes(ext)) {
-        // Es una imagen
         elemento = document.createElement("img");
-        elemento.src = url;
+        elemento.src = Url;
     } else if (["mp4", "webm", "ogg", "avi"].includes(ext)) {
-        // Es un video
         elemento = document.createElement("video");
-        elemento.src = url;
+        elemento.src = Url;
         elemento.autoplay = true;
         elemento.muted = true;
         elemento.loop = true;
     } else {
-        console.warn("Formato no soportado:", url);
+        console.warn("Formato no soportado:", Url);
         return;
     }
 
-    // Estilos comunes
+    // Estilos iniciales
+    elemento.id = Id;
+    elemento.dataset.grupo = IdGrupo;
     elemento.style.position = "absolute";
-    elemento.style.top = Math.floor(Math.random() * 80) + "%";   // posición aleatoria
-    elemento.style.left = Math.floor(Math.random() * 80) + "%";  // posición aleatoria
+    elemento.style.left = PosX + "px";
+    elemento.style.top = PosY + "px";
+    // Width
+    if (Ancho > 0) {
+        elemento.style.width = Ancho + "px";
+    } else {
+        elemento.style.width = "auto";
+    }
 
+    // Height
+    if (Alto > 0) {
+        elemento.style.height = Alto + "px";
+    } else {
+        elemento.style.height = "auto";
+    }
 
-    // Agregar al contenedor
+    elemento.style.zIndex = NivelCapa;
+    elemento.style.opacity = "0"; // inicia invisible
+    elemento.style.transition = `opacity ${FadeIn}ms ease-in`;
+
+    // Retraso para mostrar
+    setTimeout(() => {
+        elemento.style.opacity = (Opacidad / 100).toString();
+
+        // FadeOut si corresponde
+        if (FadeOut > 0) {
+            setTimeout(() => {
+                elemento.style.transition = `opacity ${FadeOut}ms ease-out`;
+                elemento.style.opacity = "0";
+            }, 3000); // aquí puedes usar duración personalizada si tienes "tiempo total de vida"
+        }
+    }, Retraso);
+
     container.appendChild(elemento);
 
-    // Guardar en el Map usando la url como key
-    elementosMap.set(url, elemento);
+    // Guardar en el mapa
+    elementosMap.set(Id, { grupo: IdGrupo, nodo: elemento });
 }

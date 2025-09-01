@@ -1,21 +1,23 @@
-﻿Imports System.IO
+﻿Imports System.Diagnostics
+Imports System.IO
 Imports System.Net.Mime
 Imports System.Text
 Imports System.Threading
 Imports EmbedIO
 Imports EmbedIO.Files
-Imports Microsoft.Web.WebView2.Core
-Imports Microsoft.Web.WebView2.WinForms
-
 Imports EmbedIO.Utilities
 Imports EmbedIO.WebApi
-Imports System.Diagnostics
+Imports Microsoft.Web.WebView2.Core
+Imports Microsoft.Web.WebView2.WinForms
+Imports Newtonsoft.Json
 Public Class form_webview
     Private web As Microsoft.Web.WebView2.WinForms.WebView2
     Private server As New MiniServer()
 
     Private Async Sub form_webview_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         ' Iniciar mini servidor
+
+
         server.StartServer()
         Me.FormBorderStyle = FormBorderStyle.None
 
@@ -30,12 +32,43 @@ Public Class form_webview
         web.CoreWebView2.Navigate("http://localhost:5000/index.html")
     End Sub
 
-    Public Async Sub MostrarSaludo(nombre As String)
+    Public Async Sub AgregarObjetoDisplay(
+        IdGrupo As String,
+        Id As String,
+        Url As String,
+        Optional Ancho As Integer = 200,
+        Optional Alto As Integer = 200,
+        Optional PosX As Integer = 0,
+        Optional PosY As Integer = 0,
+        Optional NivelCapa As Integer = 0,
+        Optional Opacidad As Integer = 100,
+        Optional Retraso As Integer = 0,
+        Optional FadeIn As Integer = 0,
+        Optional FadeOut As Integer = 0)
 
-        Dim path = nombre.Replace("\", "\\")  ' ← escapamos
+        ' Crear objeto de configuración
+        Dim config = New With {
+        .IdGrupo = IdGrupo,
+        .Id = Id,
+        .Url = Url.Replace("\", "\\"),
+        .Ancho = Ancho,
+        .Alto = Alto,
+        .PosX = PosX,
+        .PosY = PosY,
+        .NivelCapa = NivelCapa,
+        .Opacidad = Opacidad,
+        .Retraso = Retraso,
+        .FadeIn = FadeIn,
+        .FadeOut = FadeOut
+    }
 
-        Await web.CoreWebView2.ExecuteScriptAsync($"saludar('{path}');")
+        ' Serializar a JSON usando Newtonsoft
+        Dim json As String = JsonConvert.SerializeObject(config)
+
+        ' Ejecutar JS en WebView2
+        Await web.CoreWebView2.ExecuteScriptAsync($"agregarObjetoDisplay({json});")
     End Sub
+
 
     Private Sub form_webview_FormClosing(sender As Object, e As FormClosingEventArgs) Handles Me.FormClosing
         server.StopServer()
