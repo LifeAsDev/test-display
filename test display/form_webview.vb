@@ -10,6 +10,15 @@ Imports EmbedIO.WebApi
 Imports Microsoft.Web.WebView2.Core
 Imports Microsoft.Web.WebView2.WinForms
 Imports Newtonsoft.Json
+Public Class TextoConfig
+    Public Property Contenido As String
+    Public Property Color As String
+    Public Property FontSize As Integer
+     Public  Property FontWeight As String
+    Public Property FontFamily As String
+    Public Property Align As String
+End Class
+
 Public Class form_webview
     Private web As Microsoft.Web.WebView2.WinForms.WebView2
     Private server As New MiniServer()
@@ -39,7 +48,8 @@ Public Class form_webview
     Public Async Sub AgregarObjetoDisplay(
         IdGrupo As String,
         Id As String,
-        Url As String,
+        Optional Url As String = "",
+        Optional Texto As TextoConfig = Nothing,
         Optional Ancho As Integer = 200,
         Optional Alto As Integer = 200,
         Optional PosX As Integer = 0,
@@ -55,6 +65,7 @@ Public Class form_webview
         .IdGrupo = IdGrupo,
         .Id = Id,
         .Url = Url.Replace("\", "\\"),
+        .Texto = Texto,
         .Ancho = Ancho,
         .Alto = Alto,
         .PosX = PosX,

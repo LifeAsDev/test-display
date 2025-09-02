@@ -2,24 +2,8 @@
 Partial Class Form2
     Inherits System.Windows.Forms.Form
 
-    'Form reemplaza a Dispose para limpiar la lista de componentes.
-    <System.Diagnostics.DebuggerNonUserCode()>
-    Protected Overrides Sub Dispose(ByVal disposing As Boolean)
-        Try
-            If disposing AndAlso components IsNot Nothing Then
-                components.Dispose()
-            End If
-        Finally
-            MyBase.Dispose(disposing)
-        End Try
-    End Sub
-
-    'Requerido por el Diseñador de Windows Forms
     Private components As System.ComponentModel.IContainer
 
-    'NOTA: el Diseñador de Windows Forms necesita el siguiente procedimiento
-    'Se puede modificar usando el Diseñador de Windows Forms.  
-    'No lo modifique con el editor de código.
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
         Me.BtnAgregar = New System.Windows.Forms.Button()
@@ -28,6 +12,8 @@ Partial Class Form2
         Me.NUDAncho = New System.Windows.Forms.NumericUpDown()
         Me.NUDAlto = New System.Windows.Forms.NumericUpDown()
         Me.NUDOpacidad = New System.Windows.Forms.NumericUpDown()
+        Me.TxtContenido = New System.Windows.Forms.TextBox()
+        Me.BtnTexto = New System.Windows.Forms.Button()
         CType(Me.NUDPosX, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.NUDPosY, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.NUDAncho, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -41,7 +27,7 @@ Partial Class Form2
         Me.BtnAgregar.Name = "BtnAgregar"
         Me.BtnAgregar.Size = New System.Drawing.Size(120, 30)
         Me.BtnAgregar.TabIndex = 0
-        Me.BtnAgregar.Text = "Agregar Objeto"
+        Me.BtnAgregar.Text = "Agregar Media"
         Me.BtnAgregar.UseVisualStyleBackColor = True
         '
         'NUDPosX
@@ -87,9 +73,27 @@ Partial Class Form2
         Me.NUDOpacidad.TabIndex = 5
         Me.NUDOpacidad.Value = New Decimal(New Integer() {100, 0, 0, 0})
         '
+        'TxtContenido
+        '
+        Me.TxtContenido.Location = New System.Drawing.Point(10, 170)
+        Me.TxtContenido.Name = "TxtContenido"
+        Me.TxtContenido.Size = New System.Drawing.Size(210, 22)
+        Me.TxtContenido.TabIndex = 6
+        '
+        'BtnTexto
+        '
+        Me.BtnTexto.Location = New System.Drawing.Point(10, 200)
+        Me.BtnTexto.Name = "BtnTexto"
+        Me.BtnTexto.Size = New System.Drawing.Size(120, 30)
+        Me.BtnTexto.TabIndex = 7
+        Me.BtnTexto.Text = "Agregar Texto"
+        Me.BtnTexto.UseVisualStyleBackColor = True
+        '
         'Form2
         '
-        Me.ClientSize = New System.Drawing.Size(250, 180)
+        Me.ClientSize = New System.Drawing.Size(250, 250)
+        Me.Controls.Add(Me.BtnTexto)
+        Me.Controls.Add(Me.TxtContenido)
         Me.Controls.Add(Me.NUDOpacidad)
         Me.Controls.Add(Me.NUDAlto)
         Me.Controls.Add(Me.NUDAncho)
@@ -104,6 +108,7 @@ Partial Class Form2
         CType(Me.NUDAlto, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.NUDOpacidad, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
+        Me.PerformLayout()
 
     End Sub
 
@@ -113,4 +118,7 @@ Partial Class Form2
     Friend WithEvents NUDAncho As NumericUpDown
     Friend WithEvents NUDAlto As NumericUpDown
     Friend WithEvents NUDOpacidad As NumericUpDown
+    Friend WithEvents TxtContenido As TextBox
+    Friend WithEvents BtnTexto As Button
+
 End Class

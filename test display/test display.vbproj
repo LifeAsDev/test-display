@@ -106,9 +106,7 @@
     <Compile Include="form_webview.Designer.vb">
       <DependentUpon>form_webview.vb</DependentUpon>
     </Compile>
-    <Compile Include="form_webview.vb">
-      <SubType>Form</SubType>
-    </Compile>
+    <Compile Include="form_webview.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
       <AutoGen>True</AutoGen>
