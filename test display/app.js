@@ -36,7 +36,7 @@ function agregarObjetoDisplay(config) {
         elemento = document.createElement("video");
         elemento.src = Url;
         elemento.autoplay = true;
-        elemento.muted = true;
+        elemento.muted = false;
         elemento.loop = true;
     } else {
         console.warn("Formato no soportado:", Url);

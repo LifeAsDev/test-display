@@ -59,6 +59,6 @@ Public Class Form2
             FadeOut:=0
         )
 
-        MessageBox.Show("Objeto agregado: " & System.IO.Path.GetFileName(url))
+
     End Sub
 End Class

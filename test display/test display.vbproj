@@ -103,19 +103,6 @@
     <Compile Include="Form2.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="form_display.Designer.vb">
-      <DependentUpon>form_display.vb</DependentUpon>
-    </Compile>
-    <Compile Include="form_display.vb">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="form_menu.vb">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="form_menu.Designer.vb">
-      <DependentUpon>form_menu.vb</DependentUpon>
-      <SubType>Form</SubType>
-    </Compile>
     <Compile Include="form_webview.Designer.vb">
       <DependentUpon>form_webview.vb</DependentUpon>
     </Compile>
@@ -142,12 +129,6 @@
   <ItemGroup>
     <EmbeddedResource Include="Form2.resx">
       <DependentUpon>Form2.vb</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="form_display.resx">
-      <DependentUpon>form_display.vb</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="form_menu.resx">
-      <DependentUpon>form_menu.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="My Project\Resources.resx">
       <Generator>VbMyResourcesResXFileCodeGenerator</Generator>
