@@ -17,7 +17,9 @@ Public Class form_webview
     Private Async Sub form_webview_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         ' Iniciar mini servidor
 
-
+        Me.TransparencyKey = Color.Lime
+        Me.BackColor = Color.Lime
+        Me.TopMost = True
         server.StartServer()
         Me.FormBorderStyle = FormBorderStyle.None
 
@@ -29,6 +31,8 @@ Public Class form_webview
         Me.Location = New Point(0, 0)
         ' Inicializar WebView2 y navegar a localhost
         Await web.EnsureCoreWebView2Async()
+
+        web.DefaultBackgroundColor = Color.Transparent ' <-- clave
         web.CoreWebView2.Navigate("http://localhost:5000/index.html")
     End Sub
 
