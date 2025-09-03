@@ -27,7 +27,7 @@ function agregarObjetoDisplay(config) {
     container.style.overflow = "hidden";
 
     let elemento;
-
+    let video = false;
     if (Url) {
         // Crear el elemento según tipo de archivo
         const ext = Url.split(".").pop().toLowerCase();
@@ -36,9 +36,10 @@ function agregarObjetoDisplay(config) {
             elemento = document.createElement("img");
             elemento.src = Url;
         } else if (["mp4", "webm", "ogg", "avi"].includes(ext)) {
+            video = true;
             elemento = document.createElement("video");
             elemento.src = Url;
-            elemento.autoplay = true;
+            elemento.autoplay = false;
             elemento.muted = false;
             elemento.loop = true;
         } else {
@@ -88,7 +89,9 @@ function agregarObjetoDisplay(config) {
     // Retraso para mostrar
     setTimeout(() => {
         elemento.style.opacity = (Opacidad / 100).toString();
-
+        if (video) {
+            elemento.play();
+        }
         // FadeOut si corresponde
         if (FadeOut > 0) {
             setTimeout(() => {

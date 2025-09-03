@@ -30,21 +30,38 @@
         Dim opacidad = CInt(NUDOpacidad.Value)
         Dim url = CopyToTempAndGetUrl(ofd.FileName)
 
-        ' Enviar al WebView
-        webForm.AgregarObjetoDisplay(
-            IdGrupo:="grupo1",
-            Id:=Guid.NewGuid().ToString(),
-            Url:=url,
-            Ancho:=ancho,
-            Alto:=alto,
-            PosX:=posX,
-            PosY:=posY,
-            NivelCapa:=1,
-            Opacidad:=opacidad,
-            Retraso:=500,
+
+        For i = 1 To 10
+            ' Enviar ccola
+            webForm.AgregarObjetoDisplay(IdGrupo:="grupo1", Id:=Guid.NewGuid().ToString(),
+            Url:=CopyToTempAndGetUrl("C:\Users\Angelo\Videos\hombre pasea.webm"),
+            Ancho:=1248,
+            Alto:=350,
+            PosX:=0 + (i * 50),
+            PosY:=30 + (i * 50),
+            NivelCapa:=2 + i,
+            Opacidad:=100,
+            Retraso:=(i * 3000),
             FadeIn:=500,
-            FadeOut:=0
-        )
+            FadeOut:=0)
+
+        Next
+
+        '' Enviar al WebView
+        'webForm.AgregarObjetoDisplay(
+        '    IdGrupo:="grupo1",
+        '    Id:=Guid.NewGuid().ToString(),
+        '    Url:=url,
+        '    Ancho:=ancho,
+        '    Alto:=alto,
+        '    PosX:=posX,
+        '    PosY:=posY,
+        '    NivelCapa:=1,
+        '    Opacidad:=opacidad,
+        '    Retraso:=500,
+        '    FadeIn:=500,
+        '    FadeOut:=0
+        ')
     End Sub
 
     Private Sub BtnAgregarTexto_Click(sender As Object, e As EventArgs)
