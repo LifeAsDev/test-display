@@ -87,8 +87,8 @@
                 .Color = "yellow",
                 .FontSize = 24,
                 .FontWeight = "bold",
-                .FontFamily = "Arial",
-                .Align = "center"
+                .FontFamily = "League Spartan",
+                .Align = "right"
             },
             Ancho:=ancho,
             Alto:=alto,

@@ -54,8 +54,16 @@ function agregarObjetoDisplay(config) {
         elemento.style.fontSize = (Texto.FontSize || 24) + "px";
         elemento.style.fontWeight = Texto.FontWeight || "normal";
         elemento.style.fontFamily = Texto.FontFamily || "sans-serif";
-        elemento.style.textAlign = Texto.Align || "left";
         elemento.style.whiteSpace = "pre-wrap"; // para soportar saltos de línea
+        if (Texto.Align === "center") {
+            elemento.style.left = PosX + "px";
+            elemento.style.transform = "translateX(-50%)";
+        } else if (Texto.Align === "right") {
+            elemento.style.left = PosX + "px";
+            elemento.style.transform = "translateX(-100%)"; 
+        } else {
+            elemento.style.left = PosX + "px";
+        }
     } else {
         console.warn("Ni Url ni Texto definidos para el objeto:", Id);
         return;
@@ -69,14 +77,14 @@ function agregarObjetoDisplay(config) {
     elemento.style.top = PosY + "px";
 
     // Width
-    if (Ancho > 0) {
+    if (Ancho > 0 && !Texto) {
         elemento.style.width = Ancho + "px";
     } else {
         elemento.style.width = "auto";
     }
 
     // Height
-    if (Alto > 0) {
+    if (Alto > 0 && !Texto) {
         elemento.style.height = Alto + "px";
     } else {
         elemento.style.height = "auto";
