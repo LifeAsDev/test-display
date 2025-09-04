@@ -14,6 +14,7 @@ Partial Class Form2
         Me.NUDOpacidad = New System.Windows.Forms.NumericUpDown()
         Me.TxtContenido = New System.Windows.Forms.TextBox()
         Me.BtnTexto = New System.Windows.Forms.Button()
+        Me.BtnClear = New System.Windows.Forms.Button()
         CType(Me.NUDPosX, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.NUDPosY, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.NUDAncho, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -35,7 +36,7 @@ Partial Class Form2
         Me.NUDPosX.Location = New System.Drawing.Point(10, 10)
         Me.NUDPosX.Maximum = New Decimal(New Integer() {1920, 0, 0, 0})
         Me.NUDPosX.Name = "NUDPosX"
-        Me.NUDPosX.Size = New System.Drawing.Size(100, 22)
+        Me.NUDPosX.Size = New System.Drawing.Size(100, 20)
         Me.NUDPosX.TabIndex = 1
         Me.NUDPosX.Value = New Decimal(New Integer() {100, 0, 0, 0})
         '
@@ -44,7 +45,7 @@ Partial Class Form2
         Me.NUDPosY.Location = New System.Drawing.Point(120, 10)
         Me.NUDPosY.Maximum = New Decimal(New Integer() {1080, 0, 0, 0})
         Me.NUDPosY.Name = "NUDPosY"
-        Me.NUDPosY.Size = New System.Drawing.Size(100, 22)
+        Me.NUDPosY.Size = New System.Drawing.Size(100, 20)
         Me.NUDPosY.TabIndex = 2
         Me.NUDPosY.Value = New Decimal(New Integer() {100, 0, 0, 0})
         '
@@ -53,7 +54,7 @@ Partial Class Form2
         Me.NUDAncho.Location = New System.Drawing.Point(10, 50)
         Me.NUDAncho.Maximum = New Decimal(New Integer() {1920, 0, 0, 0})
         Me.NUDAncho.Name = "NUDAncho"
-        Me.NUDAncho.Size = New System.Drawing.Size(100, 22)
+        Me.NUDAncho.Size = New System.Drawing.Size(100, 20)
         Me.NUDAncho.TabIndex = 3
         '
         'NUDAlto
@@ -61,15 +62,14 @@ Partial Class Form2
         Me.NUDAlto.Location = New System.Drawing.Point(120, 50)
         Me.NUDAlto.Maximum = New Decimal(New Integer() {1080, 0, 0, 0})
         Me.NUDAlto.Name = "NUDAlto"
-        Me.NUDAlto.Size = New System.Drawing.Size(100, 22)
+        Me.NUDAlto.Size = New System.Drawing.Size(100, 20)
         Me.NUDAlto.TabIndex = 4
         '
         'NUDOpacidad
         '
         Me.NUDOpacidad.Location = New System.Drawing.Point(10, 90)
-        Me.NUDOpacidad.Maximum = New Decimal(New Integer() {100, 0, 0, 0})
         Me.NUDOpacidad.Name = "NUDOpacidad"
-        Me.NUDOpacidad.Size = New System.Drawing.Size(100, 22)
+        Me.NUDOpacidad.Size = New System.Drawing.Size(100, 20)
         Me.NUDOpacidad.TabIndex = 5
         Me.NUDOpacidad.Value = New Decimal(New Integer() {100, 0, 0, 0})
         '
@@ -77,7 +77,7 @@ Partial Class Form2
         '
         Me.TxtContenido.Location = New System.Drawing.Point(10, 170)
         Me.TxtContenido.Name = "TxtContenido"
-        Me.TxtContenido.Size = New System.Drawing.Size(210, 22)
+        Me.TxtContenido.Size = New System.Drawing.Size(210, 20)
         Me.TxtContenido.TabIndex = 6
         '
         'BtnTexto
@@ -89,9 +89,18 @@ Partial Class Form2
         Me.BtnTexto.Text = "Agregar Texto"
         Me.BtnTexto.UseVisualStyleBackColor = True
         '
+        'BtnClear
+        '
+        Me.BtnClear.Location = New System.Drawing.Point(136, 130)
+        Me.BtnClear.Name = "BtnClear"
+        Me.BtnClear.Size = New System.Drawing.Size(102, 30)
+        Me.BtnClear.TabIndex = 0
+        Me.BtnClear.Text = "Clear All"
+        Me.BtnClear.UseVisualStyleBackColor = True
+        '
         'Form2
         '
-        Me.ClientSize = New System.Drawing.Size(250, 250)
+        Me.ClientSize = New System.Drawing.Size(250, 246)
         Me.Controls.Add(Me.BtnTexto)
         Me.Controls.Add(Me.TxtContenido)
         Me.Controls.Add(Me.NUDOpacidad)
@@ -100,6 +109,7 @@ Partial Class Form2
         Me.Controls.Add(Me.NUDPosY)
         Me.Controls.Add(Me.NUDPosX)
         Me.Controls.Add(Me.BtnAgregar)
+        Me.Controls.Add(Me.BtnClear)
         Me.Name = "Form2"
         Me.Text = "Agregar Objeto Display"
         CType(Me.NUDPosX, System.ComponentModel.ISupportInitialize).EndInit()
@@ -120,5 +130,6 @@ Partial Class Form2
     Friend WithEvents NUDOpacidad As NumericUpDown
     Friend WithEvents TxtContenido As TextBox
     Friend WithEvents BtnTexto As Button
+    Friend WithEvents BtnClear As Button
 
 End Class

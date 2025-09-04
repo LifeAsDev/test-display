@@ -102,6 +102,14 @@ Public Class form_webview
 
     End Sub
 
+    Public Async Sub clearAllElements()
+
+
+        Await web.CoreWebView2.ExecuteScriptAsync($"clearAllElements();")
+
+
+    End Sub
+
 
     Private Sub form_webview_FormClosing(sender As Object, e As FormClosingEventArgs) Handles Me.FormClosing
         server.StopServer()

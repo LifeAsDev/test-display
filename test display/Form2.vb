@@ -7,6 +7,7 @@
         ' Conectar eventos de los botones del Designer
         AddHandler BtnAgregar.Click, AddressOf BtnAgregar_Click
         AddHandler BtnTexto.Click, AddressOf BtnAgregarTexto_Click
+        AddHandler BtnClear.Click, Sub() webForm.clearAllElements()
 
         ' Posicionar ventana secundaria
         Me.Left = webForm.Width + 20
@@ -44,7 +45,7 @@
             PosY:=posY,
             NivelCapa:=2 + i,
             Opacidad:=100,
-            Retraso:=0,
+            Retraso:=i * 5000,
             FadeIn:=500,
             FadeOut:=0)
 

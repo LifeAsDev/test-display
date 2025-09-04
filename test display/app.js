@@ -35,11 +35,11 @@ function agregarObjetoDisplay(config) {
 
         if (["png", "jpg", "jpeg", "gif", "webp"].includes(ext)) {
             elemento = document.createElement("img");
-            elemento.src = Url;
+            elemento.src = uniqueUrl;
         } else if (["mp4", "webm", "ogg", "avi"].includes(ext)) {
             video = true;
             elemento = document.createElement("video");
-            elemento.src = Url;
+            elemento.src = uniqueUrl;
             elemento.autoplay = false;
             elemento.muted = false;
             elemento.loop = true;
@@ -115,4 +115,13 @@ function agregarObjetoDisplay(config) {
 
     // Guardar en el mapa
     elementosMap.set(Id, { grupo: IdGrupo, nodo: elemento });
+}
+
+function clearAllElements() {
+    elementosMap.forEach(({ nodo }) => {
+        if (nodo.parentNode) {
+            nodo.parentNode.removeChild(nodo);
+        }
+    });
+    elementosMap.clear();
 }
