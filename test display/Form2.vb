@@ -16,6 +16,7 @@
         webForm.Left = 0
         webForm.Top = 0
         webForm.ShowInTaskbar = True
+        ComboBox1.SelectedIndex = 0
 
         webForm.Show()
     End Sub
@@ -82,6 +83,7 @@
         If String.IsNullOrWhiteSpace(textoContenido) Then
             Return
         End If
+        Dim efectoSeleccionado As Integer = ComboBox1.SelectedIndex
 
         ' Enviar al WebView como objeto de texto
         webForm.AgregarObjetoDisplay(
@@ -94,7 +96,7 @@
                 .FontWeight = "bold",
                 .FontFamily = "Dreams Adventure Co",
                 .Align = "left",
-                .Efecto = 2
+                .Efecto = efectoSeleccionado
             },
             Ancho:=ancho,
             Alto:=alto,

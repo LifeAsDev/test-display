@@ -15,6 +15,7 @@ Partial Class Form2
         Me.TxtContenido = New System.Windows.Forms.TextBox()
         Me.BtnTexto = New System.Windows.Forms.Button()
         Me.BtnClear = New System.Windows.Forms.Button()
+        Me.ComboBox1 = New System.Windows.Forms.ComboBox()
         CType(Me.NUDPosX, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.NUDPosY, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.NUDAncho, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -98,9 +99,21 @@ Partial Class Form2
         Me.BtnClear.Text = "Clear All"
         Me.BtnClear.UseVisualStyleBackColor = True
         '
+        'ComboBox1
+        '
+        Me.ComboBox1.DisplayMember = "0"
+        Me.ComboBox1.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.ComboBox1.FormattingEnabled = True
+        Me.ComboBox1.Items.AddRange(New Object() {"0", "1", "2", "3", "4", "5"})
+        Me.ComboBox1.Location = New System.Drawing.Point(136, 206)
+        Me.ComboBox1.Name = "ComboBox1"
+        Me.ComboBox1.Size = New System.Drawing.Size(102, 21)
+        Me.ComboBox1.TabIndex = 8
+        '
         'Form2
         '
         Me.ClientSize = New System.Drawing.Size(250, 246)
+        Me.Controls.Add(Me.ComboBox1)
         Me.Controls.Add(Me.BtnTexto)
         Me.Controls.Add(Me.TxtContenido)
         Me.Controls.Add(Me.NUDOpacidad)
@@ -131,5 +144,5 @@ Partial Class Form2
     Friend WithEvents TxtContenido As TextBox
     Friend WithEvents BtnTexto As Button
     Friend WithEvents BtnClear As Button
-
+    Friend WithEvents ComboBox1 As ComboBox
 End Class

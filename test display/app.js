@@ -96,7 +96,8 @@ function agregarObjetoDisplay(config) {
 
     elemento.style.zIndex = NivelCapa;
     elemento.style.opacity = "0"; // inicia invisible
-    elemento.style.transition = `, opacity ${FadeIn}ms ease-in`;
+    elemento.style.transition = (elemento.style.transition ? elemento.style.transition + ', ' : '') + `opacity ${FadeIn}ms ease-in`;
+
 
     // Retraso para mostrar
     setTimeout(() => {
