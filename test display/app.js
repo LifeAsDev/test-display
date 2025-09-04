@@ -50,9 +50,9 @@ function agregarObjetoDisplay(config) {
         // Crear elemento de texto
         elemento = document.createElement("div");
         elemento.textContent = Texto.Contenido || "";
-        elemento.style.color = Texto.Color || "#fff";
+       // elemento.style.color = Texto.Color || "#fff";
         elemento.style.fontSize = (Texto.FontSize || 24) + "px";
-        elemento.style.fontWeight = Texto.FontWeight || "normal";
+     //   elemento.style.fontWeight = Texto.FontWeight || "normal";
         elemento.style.fontFamily = Texto.FontFamily || "sans-serif";
         elemento.style.whiteSpace = "pre-wrap"; // para soportar saltos de línea
         if (Texto.Align === "center") {

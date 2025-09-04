@@ -9,10 +9,11 @@
         AddHandler BtnTexto.Click, AddressOf BtnAgregarTexto_Click
 
         ' Posicionar ventana secundaria
-        webForm.Left = Me.Left + Me.Width + 20
         Me.Left = webForm.Width + 20
         Me.Top = 50
-        webForm.Top = 50
+        webForm.StartPosition = FormStartPosition.Manual
+        webForm.Left = 0
+        webForm.Top = 0
         webForm.Show()
     End Sub
 
@@ -28,39 +29,41 @@
         Dim ancho = CInt(NUDAncho.Value)
         Dim alto = CInt(NUDAlto.Value)
         Dim opacidad = CInt(NUDOpacidad.Value)
-        Dim url = CopyToTempAndGetUrl(ofd.FileName)
+        'Dim url = CopyToTempAndGetUrl(ofd.FileName)
 
+        Dim ruta As String = ofd.FileName
+        Dim url2 As String = "http://localhost:5000/file?path=" & Uri.EscapeDataString(ruta)
 
         For i = 1 To 10
             ' Enviar ccola
             webForm.AgregarObjetoDisplay(IdGrupo:="grupo1", Id:=Guid.NewGuid().ToString(),
-            Url:=CopyToTempAndGetUrl("C:\Users\Angelo\Videos\hombre pasea.webm"),
-            Ancho:=1248,
-            Alto:=350,
+            Url:=CopyToTempAndGetUrl("C:\Users\Angelo\Videos\pepsi transparent.webm"),
+            Ancho:=0,
+            Alto:=0,
             PosX:=0 + (i * 50),
-            PosY:=30 + (i * 50),
+            PosY:=0,
             NivelCapa:=2 + i,
             Opacidad:=100,
-            Retraso:=(i * 3000),
+            Retraso:=0,
             FadeIn:=500,
             FadeOut:=0)
 
         Next
 
-        '' Enviar al WebView
+        'Enviar al WebView
         'webForm.AgregarObjetoDisplay(
-        '    IdGrupo:="grupo1",
-        '    Id:=Guid.NewGuid().ToString(),
-        '    Url:=url,
-        '    Ancho:=ancho,
-        '    Alto:=alto,
-        '    PosX:=posX,
-        '    PosY:=posY,
-        '    NivelCapa:=1,
-        '    Opacidad:=opacidad,
-        '    Retraso:=500,
-        '    FadeIn:=500,
-        '    FadeOut:=0
+        'IdGrupo:="grupo1",
+        'Id:=Guid.NewGuid().ToString(),
+        'Url:=url2,
+        '   Ancho:=ancho,
+        'Alto:=alto,
+        'PosX:=posX,
+        'PosY:=posY,
+        'NivelCapa:=1,
+        '  Opacidad:=opacidad,
+        'Retraso:=500,
+        'FadeIn:=500,
+        'FadeOut:=0
         ')
     End Sub
 
@@ -74,7 +77,6 @@
         Dim textoContenido = TxtContenido.Text
 
         If String.IsNullOrWhiteSpace(textoContenido) Then
-            MessageBox.Show("Escribe algún texto antes de agregar.")
             Return
         End If
 
@@ -87,8 +89,8 @@
                 .Color = "yellow",
                 .FontSize = 24,
                 .FontWeight = "bold",
-                .FontFamily = "League Spartan",
-                .Align = "right"
+                .FontFamily = "Dreams Adventure Co",
+                .Align = "left"
             },
             Ancho:=ancho,
             Alto:=alto,
