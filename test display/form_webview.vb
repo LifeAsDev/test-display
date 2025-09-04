@@ -36,29 +36,29 @@ Public Class form_webview
         Me.FormBorderStyle = FormBorderStyle.None
 
         ' Crear WebView2
-        'web = New Microsoft.Web.WebView2.WinForms.WebView2()
-        'web.Dock = DockStyle.Fill
-        'Me.Controls.Add(web)
-        'Me.StartPosition = FormStartPosition.Manual
-        'Me.Location = New Point(0, 0)
-        '' Inicializar WebView2 y navegar a localhost
-        'Await web.EnsureCoreWebView2Async()
+        web = New Microsoft.Web.WebView2.WinForms.WebView2()
+        web.Dock = DockStyle.Fill
+        Me.Controls.Add(web)
+        Me.StartPosition = FormStartPosition.Manual
+        Me.Location = New Point(0, 0)
+        ' Inicializar WebView2 y navegar a localhost
+        Await web.EnsureCoreWebView2Async()
 
-        'web.DefaultBackgroundColor = Color.Transparent ' <-- clave
-        'web.CoreWebView2.Navigate("http://localhost:5000/index.html")
-        Xpcom.Initialize("C:\Users\Angelo\Desktop\project\test display\test display\Firefox\") ' <-- Cambia por tu ruta
+        web.DefaultBackgroundColor = Color.Transparent ' <-- clave
+        web.CoreWebView2.Navigate("http://localhost:5000/index.html")
+        'Xpcom.Initialize("C:\Users\Angelo\Desktop\project\test display\test display\Firefox\") ' <-- Cambia por tu ruta
 
         ' Crear el GeckoWebBrowser
-        browser = New GeckoWebBrowser() With {
-        .Dock = DockStyle.Fill,
-        .BackColor = Color.Lime ' <-- Establecer el color de fondo del control
-    }
-        Me.Controls.Add(browser)
+        '    browser = New GeckoWebBrowser() With {
+        '    .Dock = DockStyle.Fill,
+        '    .BackColor = Color.Lime ' <-- Establecer el color de fondo del control
+        '}
+        '    Me.Controls.Add(browser)
 
-        browser.NoDefaultContextMenu = True
+        '    browser.NoDefaultContextMenu = True
 
-        ' Navegar a una página de prueba
-        browser.Navigate("localhost:5000")
+        '    ' Navegar a una página de prueba
+        '    browser.Navigate("localhost:5000")
     End Sub
 
     Public Async Sub AgregarObjetoDisplay(
@@ -97,7 +97,7 @@ Public Class form_webview
         Dim json As String = JsonConvert.SerializeObject(config)
 
         ' Ejecutar JS en WebView2
-        browser.Navigate("javascript:void(agregarObjetoDisplay(" & json & "))")
+        Await web.CoreWebView2.ExecuteScriptAsync($"agregarObjetoDisplay({json});")
 
 
     End Sub
