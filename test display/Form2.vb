@@ -15,6 +15,8 @@
         webForm.StartPosition = FormStartPosition.Manual
         webForm.Left = 0
         webForm.Top = 0
+        webForm.ShowInTaskbar = False
+
         webForm.Show()
     End Sub
 
