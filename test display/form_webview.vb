@@ -19,6 +19,8 @@ Public Class TextoConfig
      Public  Property FontWeight As String
     Public Property FontFamily As String
     Public Property Align As String
+    Public Property Efecto As Integer
+
 End Class
 
 Public Class form_webview

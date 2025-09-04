@@ -66,6 +66,8 @@ function agregarObjetoDisplay(config) {
         } else {
             elemento.style.left = PosX + "px";
         }
+
+         aplicarEfecto(elemento, Texto.Efecto || 0);
     } else {
         console.warn("Ni Url ni Texto definidos para el objeto:", Id);
         return;
@@ -94,7 +96,7 @@ function agregarObjetoDisplay(config) {
 
     elemento.style.zIndex = NivelCapa;
     elemento.style.opacity = "0"; // inicia invisible
-    elemento.style.transition = `opacity ${FadeIn}ms ease-in`;
+    elemento.style.transition = `, opacity ${FadeIn}ms ease-in`;
 
     // Retraso para mostrar
     setTimeout(() => {
@@ -105,11 +107,11 @@ function agregarObjetoDisplay(config) {
         // FadeOut si corresponde
         if (FadeOut > 0) {
             setTimeout(() => {
-                elemento.style.transition = `opacity ${FadeOut}ms ease-out`;
+                elemento.style.transition = `opacity ${.1}s ease-out`;
                 elemento.style.opacity = "0";
-            }, 3000); // TODO: podrías reemplazar este 3000 por un parámetro "Duracion"
+            }, FadeOut); 
         }
-    }, Retraso);
+    },Math.max( Retraso,10));
 
     container.appendChild(elemento);
 
@@ -124,4 +126,57 @@ function clearAllElements() {
         }
     });
     elementosMap.clear();
+}
+
+function aplicarEfecto(elemento, efecto) {
+    switch (efecto) {
+        case 1: // Máquina de escribir
+            const texto = elemento.textContent;
+            elemento.textContent = "";
+            let i = 0;
+            function maquina() {
+                if (i < texto.length) {
+                    elemento.textContent += texto[i];
+                    i++;
+                    setTimeout(maquina, 100);
+                }
+            }
+            maquina();
+            break;
+
+        case 2: // Caer desde arriba
+            elemento.style.position = "relative";
+            elemento.style.transform = "translateY(-50px)";
+            elemento.style.transition = "all 1s";
+            setTimeout(() => {
+                elemento.style.transform = "translateY(0)";
+            }, 50);
+            break;
+
+        case 3: // Desde izquierda
+            elemento.style.position = "relative";
+            elemento.style.transform = "translateX(-50px)";
+            elemento.style.transition = "all 1s";
+            setTimeout(() => {
+                elemento.style.transform = "translateX(0)";
+            }, 50);
+            break;
+
+        case 4: // Desde derecha
+            elemento.style.position = "relative";
+            elemento.style.transform = "translateX(50px)";
+            elemento.style.transition = "all 1s";
+            setTimeout(() => {
+                elemento.style.transform = "translateX(0)";
+            }, 50);
+            break;
+        case 5: // Caer desde arriba
+            elemento.style.position = "relative";
+            elemento.style.transform = "translateY(50px)";
+            elemento.style.transition = "all 1s";
+            setTimeout(() => {
+                elemento.style.transform = "translateY(0)";
+            }, 50);
+            break;
+    }
 }

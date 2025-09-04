@@ -15,7 +15,7 @@
         webForm.StartPosition = FormStartPosition.Manual
         webForm.Left = 0
         webForm.Top = 0
-        webForm.ShowInTaskbar = False
+        webForm.ShowInTaskbar = True
 
         webForm.Show()
     End Sub
@@ -93,7 +93,8 @@
                 .FontSize = 24,
                 .FontWeight = "bold",
                 .FontFamily = "Dreams Adventure Co",
-                .Align = "left"
+                .Align = "left",
+                .Efecto = 2
             },
             Ancho:=ancho,
             Alto:=alto,
@@ -102,7 +103,7 @@
             NivelCapa:=2,
             Opacidad:=opacidad,
             Retraso:=0,
-            FadeIn:=500,
+            FadeIn:=400,
             FadeOut:=0
         )
     End Sub
