@@ -41,7 +41,7 @@
             Ancho:=0,
             Alto:=0,
             PosX:=0 + (i * 50),
-            PosY:=0,
+            PosY:=posY,
             NivelCapa:=2 + i,
             Opacidad:=100,
             Retraso:=0,

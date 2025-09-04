@@ -31,6 +31,7 @@ function agregarObjetoDisplay(config) {
     if (Url) {
         // Crear el elemento según tipo de archivo
         const ext = Url.split(".").pop().toLowerCase();
+        const uniqueUrl = Url + (Url.includes("?") ? "&" : "?") + "v=" + Date.now();
 
         if (["png", "jpg", "jpeg", "gif", "webp"].includes(ext)) {
             elemento = document.createElement("img");
