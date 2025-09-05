@@ -1,22 +1,15 @@
-const mainCanvas = document.createElement("canvas");
-mainCanvas.width = window.innerWidth;
-mainCanvas.height = window.innerHeight;
-mainCanvas.style.position = "absolute";
-mainCanvas.style.top = "0";
-mainCanvas.style.left = "0";
-document.body.appendChild(mainCanvas);
-
-const ctx = mainCanvas.getContext("2d");
-const videosCanvas = []; // array global para todos los videos
+// Mapa global para manejar los grupos y objetos
+const elementosMap = new Map();
 
 function agregarObjetoDisplay(config) {
+    console.log(config);
     const {
         IdGrupo,
         Id,
         Url = "",
-        Texto = null,
-        Ancho = 0,
-        Alto = 0,
+        Texto = null, // objeto con configuraciones de texto
+        Ancho = 200,
+        Alto = 200,
         PosX = 0,
         PosY = 0,
         NivelCapa = 0,
@@ -27,96 +20,116 @@ function agregarObjetoDisplay(config) {
     } = config;
 
     const container = document.getElementById("image-container") || document.body;
+
     container.style.position = "relative";
     container.style.width = "100vw";
     container.style.height = "100vh";
     container.style.overflow = "hidden";
 
+    let elemento;
+    let video = false;
     if (Url) {
+        // Crear el elemento según tipo de archivo
         const ext = Url.split(".").pop().toLowerCase();
         const uniqueUrl = Url + (Url.includes("?") ? "&" : "?") + "v=" + Date.now();
 
         if (["png", "jpg", "jpeg", "gif", "webp"].includes(ext)) {
-            const img = document.createElement("img");
-            img.src = uniqueUrl;
-            img.style.position = "absolute";
-            img.style.left = PosX + "px";
-            img.style.top = PosY + "px";
-            img.style.width = Ancho > 0 ? Ancho + "px" : "auto";
-            img.style.height = Alto > 0 ? Alto + "px" : "auto";
-            img.style.opacity = 0;
-            img.style.transition = `opacity ${FadeIn}ms ease-in`;
-
-            setTimeout(() => {
-                img.style.opacity = Opacidad / 100;
-            }, Retraso);
-
-            container.appendChild(img);
-            elementosMap.set(Id, { grupo: IdGrupo, nodo: img });
-
+            elemento = document.createElement("img");
+            elemento.src = uniqueUrl;
         } else if (["mp4", "webm", "ogg", "avi"].includes(ext)) {
-            const v = document.createElement("video");
-            v.src = uniqueUrl;
-            v.autoplay = true;
-            v.muted = true;
-            v.loop = true;
-            v.play();
-
-            v.addEventListener("loadedmetadata", () => {
-                const width = Ancho > 0 ? Ancho : v.videoWidth;
-                const height = Alto > 0 ? Alto : v.videoHeight;
-
-                videosCanvas.push({
-                    video: v,
-                    x: PosX,
-                    y: PosY,
-                    width,
-                    height,
-                    opacity: Opacidad / 100
-                });
-            });
+            video = true;
+            elemento = document.createElement("video");
+            elemento.src = uniqueUrl;
+            elemento.autoplay = false;
+            elemento.muted = false;
+            elemento.loop = true;
+        } else {
+            console.warn("Formato no soportado:", Url);
+            return;
         }
     } else if (Texto) {
-        const div = document.createElement("div");
-        div.innerHTML = Texto.Contenido || "";
-        div.style.fontSize = (Texto.FontSize || 24) + "px";
-        div.style.fontFamily = Texto.FontFamily || "sans-serif";
-        div.style.whiteSpace = "pre-wrap";
-        div.style.position = "absolute";
-        div.style.left = PosX + "px";
-        div.style.top = PosY + "px";
-        div.style.opacity = 0;
-        div.style.transition = `opacity ${FadeIn}ms ease-in`;
+        // Crear elemento de texto
+        elemento = document.createElement("div");
+        //  elemento.textContent = Texto.Contenido || ""
+        elemento.innerHTML = Texto.Contenido || "";
+       // elemento.style.color = Texto.Color || "#fff";
+        elemento.style.fontSize = (Texto.FontSize || 24) + "px";
+     //   elemento.style.fontWeight = Texto.FontWeight || "normal";
+        elemento.style.fontFamily = Texto.FontFamily || "sans-serif";
+        elemento.style.whiteSpace = "pre-wrap"; // para soportar saltos de línea
+        if (Texto.Align === "center") {
+            elemento.style.left = PosX + "px";
+            elemento.style.transform = "translateX(-50%)";
+        } else if (Texto.Align === "right") {
+            elemento.style.left = PosX + "px";
+            elemento.style.transform = "translateX(-100%)"; 
+        } else {
+            elemento.style.left = PosX + "px";
+        }
 
-        if (Texto.Align === "center") div.style.transform = "translateX(-50%)";
-        else if (Texto.Align === "right") div.style.transform = "translateX(-100%)";
-
-        setTimeout(() => { div.style.opacity = Opacidad / 100 }, Retraso);
-
-        container.appendChild(div);
-        elementosMap.set(Id, { grupo: IdGrupo, nodo: div });
-
-        aplicarEfecto(div, Texto.Efecto || 0);
+         aplicarEfecto(elemento, Texto.Efecto || 0);
+    } else {
+        console.warn("Ni Url ni Texto definidos para el objeto:", Id);
+        return;
     }
-}
-function renderVideos() {
-    ctx.clearRect(0, 0, mainCanvas.width, mainCanvas.height);
-    videosCanvas.forEach(v => {
-        ctx.globalAlpha = v.opacity;
-        ctx.drawImage(v.video, v.x, v.y, v.width, v.height);
-    });
-    requestAnimationFrame(renderVideos);
-}
 
-renderVideos(); // iniciar loop
+    // Estilos generales
+    elemento.id = Id;
+    elemento.dataset.grupo = IdGrupo;
+    elemento.style.position = "absolute";
+    elemento.style.left = PosX + "px";
+    elemento.style.top = PosY + "px";
+
+    // Width
+    if (Ancho > 0 && !Texto) {
+        elemento.style.width = Ancho + "px";
+    } else {
+        elemento.style.width = "auto";
+    }
+
+    // Height
+    if (Alto > 0 && !Texto) {
+        elemento.style.height = Alto + "px";
+    } else {
+        elemento.style.height = "auto";
+    }
+
+    elemento.style.zIndex = NivelCapa;
+    elemento.style.opacity = "0"; // inicia invisible
+    elemento.style.transition = (elemento.style.transition ? elemento.style.transition + ', ' : '') + `opacity ${FadeIn}ms ease-in`;
+
+
+    // Retraso para mostrar
+    setTimeout(() => {
+        elemento.style.opacity = (Opacidad / 100).toString();
+        if (video) {
+            elemento.play();
+        }
+        // FadeOut si corresponde
+        if (FadeOut > 0) {
+            setTimeout(() => {
+                elemento.style.transition = `opacity ${.1}s ease-out`;
+                elemento.style.opacity = "0";
+            }, FadeOut); 
+        }
+    },Math.max( Retraso,10));
+
+    container.appendChild(elemento);
+
+    // Guardar en el mapa
+    elementosMap.set(Id, { grupo: IdGrupo, nodo: elemento });
+}
 
 function clearAllElements() {
     elementosMap.forEach(({ nodo }) => {
-        if (nodo.parentNode) nodo.parentNode.removeChild(nodo);
+        if (nodo.parentNode) {
+            nodo.parentNode.removeChild(nodo);
+        }
     });
     elementosMap.clear();
-    videosWorker.length = 0;
 }
+
+
 
 function aplicarEfecto(elemento, efecto) {
     let inner;
@@ -174,7 +187,7 @@ function aplicarEfecto(elemento, efecto) {
             elemento.style.overflow = "hidden";
 
 
-            inner = document.createElement("div");
+             inner = document.createElement("div");
             while (elemento.firstChild) inner.appendChild(elemento.firstChild);
             elemento.appendChild(inner);
 
@@ -182,14 +195,14 @@ function aplicarEfecto(elemento, efecto) {
             inner.style.transition = "transform 1.5s ease";
 
             setTimeout(() => {
-                inner.style.transform = "translateY(0)";
+                inner.style.transform = "translateY(0)"; 
             }, 50);
 
         case 7:
             elemento.style.overflow = "hidden";
+         
 
-
-            inner = document.createElement("div");
+             inner = document.createElement("div");
             while (elemento.firstChild) inner.appendChild(elemento.firstChild);
             elemento.appendChild(inner);
 
@@ -197,7 +210,7 @@ function aplicarEfecto(elemento, efecto) {
             inner.style.transition = "transform 1.5s ease";
 
             setTimeout(() => {
-                inner.style.transform = "translateY(0)";
+                inner.style.transform = "translateY(0)"; 
             }, 50);
 
 

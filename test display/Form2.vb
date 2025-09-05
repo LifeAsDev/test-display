@@ -41,19 +41,49 @@
         For i = 1 To 10
             ' Enviar ccola
             webForm.AgregarObjetoDisplay(IdGrupo:="grupo1", Id:=Guid.NewGuid().ToString(),
-            Url:=CopyToTempAndGetUrl("C:\Users\Angelo\Videos\pepsi transparent.webm"),
+            Url:=CopyToTempAndGetUrl("C:\Users\Angelo\Downloads\archivos test v7\Pepsi.webm"),
             Ancho:=0,
             Alto:=0,
             PosX:=0 + (i * 50),
             PosY:=posY,
             NivelCapa:=2 + i,
             Opacidad:=100,
-            Retraso:=i * 5000,
+            Retraso:=i * 100,
             FadeIn:=500,
             FadeOut:=0)
 
         Next
 
+        For i = 1 To 10
+            ' Enviar ccola
+            webForm.AgregarObjetoDisplay(IdGrupo:="grupo1", Id:=Guid.NewGuid().ToString(),
+            Url:=CopyToTempAndGetUrl("C:\Users\Angelo\Downloads\archivos test v7\gato.webm"),
+            Ancho:=0,
+            Alto:=0,
+            PosX:=0 + (i * 50),
+            PosY:=posY,
+            NivelCapa:=2 + i,
+            Opacidad:=100,
+            Retraso:=0,
+            FadeIn:=500,
+            FadeOut:=0)
+
+        Next
+        For i = 1 To 10
+            ' Enviar ccola
+            webForm.AgregarObjetoDisplay(IdGrupo:="grupo1", Id:=Guid.NewGuid().ToString(),
+            Url:=CopyToTempAndGetUrl("C:\Users\Angelo\Downloads\archivos test v7\UDA.webm"),
+            Ancho:=0,
+            Alto:=0,
+            PosX:=0 + (i * 50),
+            PosY:=posY,
+            NivelCapa:=2 + i,
+            Opacidad:=100,
+            Retraso:=0,
+            FadeIn:=500,
+            FadeOut:=0)
+
+        Next
         'Enviar al WebView
         'webForm.AgregarObjetoDisplay(
         'IdGrupo:="grupo1",
