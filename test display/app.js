@@ -1,205 +1,63 @@
-const mainCanvas = document.createElement("canvas");
-mainCanvas.width = window.innerWidth;
-mainCanvas.height = window.innerHeight;
-mainCanvas.style.position = "absolute";
-mainCanvas.style.top = "0";
-mainCanvas.style.left = "0";
-document.body.appendChild(mainCanvas);
+﻿
+const canvas = document.getElementById("displayCanvas");
+const ctx = canvas.getContext("2d");
 
-const ctx = mainCanvas.getContext("2d");
-const videosCanvas = []; // array global para todos los videos
+const elementosMap = new Map();
 
 function agregarObjetoDisplay(config) {
-    const {
-        IdGrupo,
-        Id,
-        Url = "",
-        Texto = null,
-        Ancho = 0,
-        Alto = 0,
-        PosX = 0,
-        PosY = 0,
-        NivelCapa = 0,
-        Opacidad = 100,
-        Retraso = 0,
-        FadeIn = 0,
-        FadeOut = 0
-    } = config;
+    const { Id, Url, Ancho = 200, Alto = 200, PosX = 0, PosY = 0, Opacidad = 100 } = config;
 
-    const container = document.getElementById("image-container") || document.body;
-    container.style.position = "relative";
-    container.style.width = "100vw";
-    container.style.height = "100vh";
-    container.style.overflow = "hidden";
+    const ext = Url.split(".").pop().toLowerCase();
+    if (!["mp4","webm","ogg"].includes(ext)) return;
 
-    if (Url) {
-        const ext = Url.split(".").pop().toLowerCase();
-        const uniqueUrl = Url + (Url.includes("?") ? "&" : "?") + "v=" + Date.now();
+    const vid = document.createElement("video");
+    vid.src = Url;
+    vid.muted = true;
+    vid.autoplay = true;
+    vid.playsInline = true;
 
-        if (["png", "jpg", "jpeg", "gif", "webp"].includes(ext)) {
-            const img = document.createElement("img");
-            img.src = uniqueUrl;
-            img.style.position = "absolute";
-            img.style.left = PosX + "px";
-            img.style.top = PosY + "px";
-            img.style.width = Ancho > 0 ? Ancho + "px" : "auto";
-            img.style.height = Alto > 0 ? Alto + "px" : "auto";
-            img.style.opacity = 0;
-            img.style.transition = `opacity ${FadeIn}ms ease-in`;
+    const objeto = {
+        id: Id,
+        x: PosX,
+        y: PosY,
+        w: Ancho,
+        h: Alto,
+        opacity: Opacidad / 100,
+        recurso: vid
+    };
 
-            setTimeout(() => {
-                img.style.opacity = Opacidad / 100;
-            }, Retraso);
-
-            container.appendChild(img);
-            elementosMap.set(Id, { grupo: IdGrupo, nodo: img });
-
-        } else if (["mp4", "webm", "ogg", "avi"].includes(ext)) {
-            const v = document.createElement("video");
-            v.src = uniqueUrl;
-            v.autoplay = true;
-            v.muted = true;
-            v.loop = true;
-            v.play();
-
-            v.addEventListener("loadedmetadata", () => {
-                const width = Ancho > 0 ? Ancho : v.videoWidth;
-                const height = Alto > 0 ? Alto : v.videoHeight;
-
-                videosCanvas.push({
-                    video: v,
-                    x: PosX,
-                    y: PosY,
-                    width,
-                    height,
-                    opacity: Opacidad / 100
-                });
-            });
-        }
-    } else if (Texto) {
-        const div = document.createElement("div");
-        div.innerHTML = Texto.Contenido || "";
-        div.style.fontSize = (Texto.FontSize || 24) + "px";
-        div.style.fontFamily = Texto.FontFamily || "sans-serif";
-        div.style.whiteSpace = "pre-wrap";
-        div.style.position = "absolute";
-        div.style.left = PosX + "px";
-        div.style.top = PosY + "px";
-        div.style.opacity = 0;
-        div.style.transition = `opacity ${FadeIn}ms ease-in`;
-
-        if (Texto.Align === "center") div.style.transform = "translateX(-50%)";
-        else if (Texto.Align === "right") div.style.transform = "translateX(-100%)";
-
-        setTimeout(() => { div.style.opacity = Opacidad / 100 }, Retraso);
-
-        container.appendChild(div);
-        elementosMap.set(Id, { grupo: IdGrupo, nodo: div });
-
-        aplicarEfecto(div, Texto.Efecto || 0);
-    }
-}
-function renderVideos() {
-    ctx.clearRect(0, 0, mainCanvas.width, mainCanvas.height);
-    videosCanvas.forEach(v => {
-        ctx.globalAlpha = v.opacity;
-        ctx.drawImage(v.video, v.x, v.y, v.width, v.height);
-    });
-    requestAnimationFrame(renderVideos);
-}
-
-renderVideos(); // iniciar loop
-
-function clearAllElements() {
-    elementosMap.forEach(({ nodo }) => {
-        if (nodo.parentNode) nodo.parentNode.removeChild(nodo);
-    });
-    elementosMap.clear();
-    videosWorker.length = 0;
-}
-
-function aplicarEfecto(elemento, efecto) {
-    let inner;
-
-    switch (efecto) {
-        case 1: // M�quina de escribir
-            const texto = elemento.textContent;
-            elemento.textContent = "";
-            let i = 0;
-            function maquina() {
-                if (i < texto.length) {
-                    elemento.textContent += texto[i];
-                    i++;
-                    setTimeout(maquina, 100);
-                }
+    vid.addEventListener("loadeddata", () => {
+        // Si ancho o alto eran 0, usar tamaño natural del video
+        if (objeto.w === 0) objeto.w = vid.videoWidth;
+        if (objeto.h === 0) objeto.h = vid.videoHeight;
+        // --- Solución para el bucle preciso ---
+        vid.addEventListener("timeupdate", () => {
+            // Reiniciar el video justo antes del final
+            // El valor de 0.05 segundos es una buena práctica, pero puedes ajustarlo
+            if (vid.currentTime >= vid.duration - 0.05) {
+                vid.currentTime = 0;
             }
-            maquina();
-            break;
-
-        case 2: // Caer desde arriba
-            elemento.style.position = "relative";
-            elemento.style.transform = "translateY(-50px)";
-            elemento.style.transition = "all 1s";
-            setTimeout(() => {
-                elemento.style.transform = "translateY(0)";
-            }, 50);
-            break;
-
-        case 3: // Desde izquierda
-            elemento.style.position = "relative";
-            elemento.style.transform = "translateX(-50px)";
-            elemento.style.transition = "all 1s";
-            setTimeout(() => {
-                elemento.style.transform = "translateX(0)";
-            }, 50);
-            break;
-
-        case 4: // Desde derecha
-            elemento.style.position = "relative";
-            elemento.style.transform = "translateX(50px)";
-            elemento.style.transition = "all 1s";
-            setTimeout(() => {
-                elemento.style.transform = "translateX(0)";
-            }, 50);
-            break;
-        case 5: // Caer desde arriba
-            elemento.style.position = "relative";
-            elemento.style.transform = "translateY(50px)";
-            elemento.style.transition = "all 1s";
-            setTimeout(() => {
-                elemento.style.transform = "translateY(0)";
-            }, 50);
-            break;
-        case 6:
-            elemento.style.overflow = "hidden";
-
-
-            inner = document.createElement("div");
-            while (elemento.firstChild) inner.appendChild(elemento.firstChild);
-            elemento.appendChild(inner);
-
-            inner.style.transform = "translateY(-100%)"; // empieza arriba
-            inner.style.transition = "transform 1.5s ease";
-
-            setTimeout(() => {
-                inner.style.transform = "translateY(0)";
-            }, 50);
-
-        case 7:
-            elemento.style.overflow = "hidden";
-
-
-            inner = document.createElement("div");
-            while (elemento.firstChild) inner.appendChild(elemento.firstChild);
-            elemento.appendChild(inner);
-
-            inner.style.transform = "translateY(100%)"; // empieza abajo
-            inner.style.transition = "transform 1.5s ease";
-
-            setTimeout(() => {
-                inner.style.transform = "translateY(0)";
-            }, 50);
-
-
-    }
+        });
+        elementosMap.set(Id, objeto);
+        vid.play().catch(() => { });
+    });
 }
+
+function drawAll() {
+    console.log(elementosMap);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    for (const el of elementosMap.values()) {
+    
+        if (el.recurso.readyState >= 2) {
+       
+            ctx.globalAlpha = el.opacity;
+            ctx.drawImage(el.recurso, el.x, el.y, el.w, el.h);
+        }
+    }
+    ctx.globalAlpha = 1;
+    requestAnimationFrame(drawAll);
+}
+
+
+
+drawAll();
