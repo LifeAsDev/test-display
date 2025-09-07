@@ -38,13 +38,18 @@ Public Class form_webview
         Me.FormBorderStyle = FormBorderStyle.None
 
         ' Crear WebView2
+        Dim env = Await CoreWebView2Environment.CreateAsync(
+    Nothing,
+    Nothing,
+    New CoreWebView2EnvironmentOptions("--enable-features=VaapiVideoDecoder --ignore-gpu-blocklist --enable-gpu-rasterization --use-gl=angle")
+)
         web = New Microsoft.Web.WebView2.WinForms.WebView2()
         web.Dock = DockStyle.Fill
         Me.Controls.Add(web)
         Me.StartPosition = FormStartPosition.Manual
         Me.Location = New Point(0, 0)
         ' Inicializar WebView2 y navegar a localhost
-        Await web.EnsureCoreWebView2Async()
+        Await web.EnsureCoreWebView2Async(env)
 
         web.DefaultBackgroundColor = Color.Transparent ' <-- clave
         web.CoreWebView2.Navigate("http://localhost:5000/index.html")
