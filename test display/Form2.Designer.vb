@@ -16,6 +16,7 @@ Partial Class Form2
         Me.BtnTexto = New System.Windows.Forms.Button()
         Me.BtnClear = New System.Windows.Forms.Button()
         Me.ComboBox1 = New System.Windows.Forms.ComboBox()
+        Me.Button1 = New System.Windows.Forms.Button()
         CType(Me.NUDPosX, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.NUDPosY, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.NUDAncho, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -110,9 +111,19 @@ Partial Class Form2
         Me.ComboBox1.Size = New System.Drawing.Size(102, 21)
         Me.ComboBox1.TabIndex = 8
         '
+        'Button1
+        '
+        Me.Button1.Location = New System.Drawing.Point(10, 236)
+        Me.Button1.Name = "Button1"
+        Me.Button1.Size = New System.Drawing.Size(120, 27)
+        Me.Button1.TabIndex = 9
+        Me.Button1.Text = "Prueba Media x10"
+        Me.Button1.UseVisualStyleBackColor = True
+        '
         'Form2
         '
-        Me.ClientSize = New System.Drawing.Size(250, 246)
+        Me.ClientSize = New System.Drawing.Size(250, 281)
+        Me.Controls.Add(Me.Button1)
         Me.Controls.Add(Me.ComboBox1)
         Me.Controls.Add(Me.BtnTexto)
         Me.Controls.Add(Me.TxtContenido)
@@ -145,4 +156,5 @@ Partial Class Form2
     Friend WithEvents BtnTexto As Button
     Friend WithEvents BtnClear As Button
     Friend WithEvents ComboBox1 As ComboBox
+    Friend WithEvents Button1 As Button
 End Class

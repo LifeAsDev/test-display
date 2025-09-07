@@ -33,72 +33,56 @@
         Dim ancho = CInt(NUDAncho.Value)
         Dim alto = CInt(NUDAlto.Value)
         Dim opacidad = CInt(NUDOpacidad.Value)
-        'Dim url = CopyToTempAndGetUrl(ofd.FileName)
+        Dim url = CopyToTempAndGetUrl(ofd.FileName)
 
-        Dim ruta As String = ofd.FileName
-        Dim url2 As String = "http://localhost:5000/file?path=" & Uri.EscapeDataString(ruta)
+        'enviar al webview
+        webForm.AgregarObjetoDisplay(
+        IdGrupo:="grupo1",
+        Id:=Guid.NewGuid().ToString(),
+        Url:=url,
+           Ancho:=ancho,
+        Alto:=alto,
+        PosX:=posX,
+        PosY:=posY,
+        NivelCapa:=1,
+          Opacidad:=opacidad,
+        Retraso:=500,
+        FadeIn:=500,
+        FadeOut:=0
+        )
+    End Sub
 
-        For i = 1 To 10
-            ' Enviar ccola
-            webForm.AgregarObjetoDisplay(IdGrupo:="grupo1", Id:=Guid.NewGuid().ToString(),
-            Url:=CopyToTempAndGetUrl("C:\Users\Angelo\Downloads\archivos test v7\Pepsi.webm"),
-            Ancho:=0,
-            Alto:=0,
-            PosX:=0 + (i * 50),
+    Private Sub BtnAgregarTest_Click(sender As Object, e As EventArgs) Handles Button1.Click
+        ' Abrir OpenFileDialog
+        Dim ofd As New OpenFileDialog()
+        ofd.Filter = "Archivos multimedia|*.png;*.jpg;*.gif;*.mp4;*.avi;*.webm|Todos los archivos|*.*"
+        If ofd.ShowDialog() <> DialogResult.OK Then Return
+
+        ' Obtener valores de los NUD del Designer
+        Dim posX = CInt(NUDPosX.Value)
+        Dim posY = CInt(NUDPosY.Value)
+        Dim ancho = CInt(NUDAncho.Value)
+        Dim alto = CInt(NUDAlto.Value)
+        Dim opacidad = CInt(NUDOpacidad.Value)
+        Dim url = CopyToTempAndGetUrl(ofd.FileName)
+
+        ' Hacer un loop de 1 a 10 para agregar múltiples objetos
+        For i As Integer = 1 To 10
+            webForm.AgregarObjetoDisplay(
+            IdGrupo:="grupo1",
+            Id:=Guid.NewGuid().ToString(),
+            Url:=url,
+            Ancho:=ancho,
+            Alto:=alto,
+            PosX:=0 + (i * 50),  ' desplazamiento horizontal
             PosY:=posY,
-            NivelCapa:=2 + i,
-            Opacidad:=100,
-            Retraso:=i * 100,
+            NivelCapa:=1 + i,       ' capas ascendentes
+            Opacidad:=opacidad,
+            Retraso:=500,
             FadeIn:=500,
-            FadeOut:=0)
-
+            FadeOut:=0
+        )
         Next
-
-        For i = 1 To 10
-            ' Enviar ccola
-            webForm.AgregarObjetoDisplay(IdGrupo:="grupo1", Id:=Guid.NewGuid().ToString(),
-            Url:=CopyToTempAndGetUrl("C:\Users\Angelo\Downloads\archivos test v7\gato.webm"),
-            Ancho:=0,
-            Alto:=0,
-            PosX:=0 + (i * 50),
-            PosY:=posY,
-            NivelCapa:=2 + i,
-            Opacidad:=100,
-            Retraso:=0,
-            FadeIn:=500,
-            FadeOut:=0)
-
-        Next
-        For i = 1 To 10
-            ' Enviar ccola
-            webForm.AgregarObjetoDisplay(IdGrupo:="grupo1", Id:=Guid.NewGuid().ToString(),
-            Url:=CopyToTempAndGetUrl("C:\Users\Angelo\Downloads\archivos test v7\UDA.webm"),
-            Ancho:=0,
-            Alto:=0,
-            PosX:=0 + (i * 50),
-            PosY:=posY,
-            NivelCapa:=2 + i,
-            Opacidad:=100,
-            Retraso:=0,
-            FadeIn:=500,
-            FadeOut:=0)
-
-        Next
-        'Enviar al WebView
-        'webForm.AgregarObjetoDisplay(
-        'IdGrupo:="grupo1",
-        'Id:=Guid.NewGuid().ToString(),
-        'Url:=url2,
-        '   Ancho:=ancho,
-        'Alto:=alto,
-        'PosX:=posX,
-        'PosY:=posY,
-        'NivelCapa:=1,
-        '  Opacidad:=opacidad,
-        'Retraso:=500,
-        'FadeIn:=500,
-        'FadeOut:=0
-        ')
     End Sub
 
     Private Sub BtnAgregarTexto_Click(sender As Object, e As EventArgs)
