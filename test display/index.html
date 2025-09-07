@@ -10,6 +10,45 @@
 <body>
     <div id="image-container"></div>
     <canvas id="main-canvas"></canvas>
+    <script>
+        async function checkDecode() {
+            const info = await navigator.mediaCapabilities.decodingInfo({
+                type: "file",
+                video: {
+                    contentType: "video/webm; codecs=vp9",
+                    width: 1920,
+                    height: 1080,
+                    framerate: 30,
+                    bitrate: 5000000
+                }
+            });
+
+            console.log(info);
+        }
+
+        // Llamar cuando quieras
+        checkDecode();
+    </script>
+    <script>
+        async function checkDecode() {
+            const info = await navigator.mediaCapabilities.decodingInfo({
+                type: "file",
+                video: {
+                    contentType: "video/webm; codecs=vp9",
+                    width: 1920,
+                    height: 1080,
+                    framerate: 30,
+                    bitrate: 5000000
+                }
+            });
+
+            console.log(info);
+        }
+
+        // Llamar cuando quieras
+        checkDecode();
+    </script>
+
     <script src="app - Copy.js"></script>
 </body>
 </html>
