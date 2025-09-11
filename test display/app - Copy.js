@@ -67,7 +67,7 @@ function agregarObjetoDisplay(config) {
             elemento.style.left = PosX + "px";
         }
 
-         aplicarEfecto(elemento, Texto.Efecto || 0);
+
     } else {
         console.warn("Ni Url ni Texto definidos para el objeto:", Id);
         return;
@@ -105,6 +105,17 @@ function agregarObjetoDisplay(config) {
         if (video) {
             elemento.play();
         }
+        if (Texto) {
+            if (Texto.Efecto === 10) {
+                setTimeout(() => {
+                    aplicarEfecto(elemento, Texto.Efecto || 0);
+                }, FadeIn)
+            }
+            else {
+                aplicarEfecto(elemento, Texto.Efecto || 0);
+            }
+        }
+     
         // FadeOut si corresponde
         if (FadeOut > 0) {
             setTimeout(() => {
@@ -150,7 +161,7 @@ function aplicarEfecto(elemento, efecto) {
             break;
 
         case 2: // Caer desde arriba
-            elemento.style.position = "relative";
+            elemento.style.position = "absolute";
             elemento.style.transform = "translateY(-50px)";
             elemento.style.transition = "all 1s";
             setTimeout(() => {
@@ -159,7 +170,7 @@ function aplicarEfecto(elemento, efecto) {
             break;
 
         case 3: // Desde izquierda
-            elemento.style.position = "relative";
+            elemento.style.position = "absolute";
             elemento.style.transform = "translateX(-50px)";
             elemento.style.transition = "all 1s";
             setTimeout(() => {
@@ -168,7 +179,7 @@ function aplicarEfecto(elemento, efecto) {
             break;
 
         case 4: // Desde derecha
-            elemento.style.position = "relative";
+            elemento.style.position = "absolute";
             elemento.style.transform = "translateX(50px)";
             elemento.style.transition = "all 1s";
             setTimeout(() => {
@@ -176,7 +187,7 @@ function aplicarEfecto(elemento, efecto) {
             }, 50);
             break;
         case 5: // Caer desde arriba
-            elemento.style.position = "relative";
+            elemento.style.position = "absolute";
             elemento.style.transform = "translateY(50px)";
             elemento.style.transition = "all 1s";
             setTimeout(() => {
@@ -197,6 +208,7 @@ function aplicarEfecto(elemento, efecto) {
             setTimeout(() => {
                 inner.style.transform = "translateY(0)"; 
             }, 50);
+            break;
 
         case 7:
             elemento.style.overflow = "hidden";
@@ -212,8 +224,57 @@ function aplicarEfecto(elemento, efecto) {
             setTimeout(() => {
                 inner.style.transform = "translateY(0)"; 
             }, 50);
+            break;
+
+        case 8:
+            transformarDivASlashed(elemento); break;
+
+        case 9:
+            elemento.classList.add("warningEffect"); break;
+
+        case 10:
+            elemento.classList.add("smokemonster");
+            const smokeText = elemento.textContent;
+            elemento.textContent = "";
+
+            smokeText.split("").forEach(letra => {
+                const span = document.createElement("span");
+                span.textContent = letra;
+                elemento.appendChild(span);
+            }); break;
+        case 11:
+            elemento.classList.add("fantasma");
+            elemento.setAttribute("data-text", elemento.textContent);
+            break;
 
 
     }
 }
 
+function transformarDivASlashed(element) {
+    if (!(element instanceof HTMLElement)) return;
+
+    // Texto original
+    const texto = element.textContent.trim();
+
+    // Limpio el contenido
+    element.textContent = "";
+
+    // Agrego clase "slashed" manteniendo las demás
+    element.classList.add("slashed");
+
+    // Crear hijos
+    const top = document.createElement("div");
+    top.className = "top";
+    top.setAttribute("title", texto);
+
+    const bot = document.createElement("div");
+    bot.className = "bot";
+    bot.setAttribute("title", texto);
+
+    // Insertar dentro del elemento original
+    element.appendChild(top);
+    element.appendChild(bot);
+
+    return element;
+}

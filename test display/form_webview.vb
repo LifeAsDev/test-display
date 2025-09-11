@@ -41,12 +41,7 @@ Public Class form_webview
         Dim env = Await CoreWebView2Environment.CreateAsync(
     Nothing,
     Nothing,
-    New CoreWebView2EnvironmentOptions("--enable-gpu-rasterization 
---enable-zero-copy 
---ignore-gpu-blocklist 
---use-gl=d3d11 
---enable-accelerated-video-decode
-")
+    New CoreWebView2EnvironmentOptions("--enable-gpu-rasterization --enable-zero-copy --ignore-gpu-blocklist --use-gl=d3d11 --enable-accelerated-video-decode")
 )
         web = New Microsoft.Web.WebView2.WinForms.WebView2()
         web.Dock = DockStyle.Fill

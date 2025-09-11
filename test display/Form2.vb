@@ -106,7 +106,7 @@
             Texto:=New TextoConfig With {
                 .Contenido = textoContenido,
                 .Color = "yellow",
-                .FontSize = 24,
+                .FontSize = 48,
                 .FontWeight = "bold",
                 .FontFamily = "Dreams Adventure Co",
                 .Align = "left",
@@ -124,4 +124,7 @@
         )
     End Sub
 
+    Private Sub ComboBox1_SelectedIndexChanged(sender As Object, e As EventArgs) Handles ComboBox1.SelectedIndexChanged
+
+    End Sub
 End Class
