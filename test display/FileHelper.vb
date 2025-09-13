@@ -9,9 +9,7 @@ Public Module FileHelper
         End If
 
         Dim tempFile = Path.Combine(tempFolder, Path.GetFileName(originalFile))
-        If Not File.Exists(tempFile) Then
-            File.Copy(originalFile, tempFile, False)
-        End If
+        File.Copy(originalFile, tempFile, True)
 
 
         Return "http://localhost:5000/uploads/" & Path.GetFileName(tempFile)

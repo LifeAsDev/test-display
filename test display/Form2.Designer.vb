@@ -18,6 +18,11 @@ Partial Class Form2
         Me.ComboBox1 = New System.Windows.Forms.ComboBox()
         Me.Button1 = New System.Windows.Forms.Button()
         Me.ComboBox2 = New System.Windows.Forms.ComboBox()
+        Me.BtnMostrar = New System.Windows.Forms.Button()
+        Me.BtnLoop = New System.Windows.Forms.Button()
+        Me.BtnOpacidad = New System.Windows.Forms.Button()
+        Me.BtnEliminar = New System.Windows.Forms.Button()
+        Me.BtnOcultar = New System.Windows.Forms.Button()
         CType(Me.NUDPosX, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.NUDPosY, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.NUDAncho, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -132,9 +137,54 @@ Partial Class Form2
         Me.ComboBox2.Size = New System.Drawing.Size(102, 21)
         Me.ComboBox2.TabIndex = 10
         '
+        'BtnMostrar
+        '
+        Me.BtnMostrar.Location = New System.Drawing.Point(260, 10)
+        Me.BtnMostrar.Name = "BtnMostrar"
+        Me.BtnMostrar.Size = New System.Drawing.Size(105, 31)
+        Me.BtnMostrar.TabIndex = 0
+        Me.BtnMostrar.Text = "Mostrar"
+        '
+        'BtnLoop
+        '
+        Me.BtnLoop.Location = New System.Drawing.Point(260, 164)
+        Me.BtnLoop.Name = "BtnLoop"
+        Me.BtnLoop.Size = New System.Drawing.Size(105, 31)
+        Me.BtnLoop.TabIndex = 11
+        Me.BtnLoop.Text = "Loop"
+        '
+        'BtnOpacidad
+        '
+        Me.BtnOpacidad.Location = New System.Drawing.Point(260, 127)
+        Me.BtnOpacidad.Name = "BtnOpacidad"
+        Me.BtnOpacidad.Size = New System.Drawing.Size(105, 31)
+        Me.BtnOpacidad.TabIndex = 12
+        Me.BtnOpacidad.Text = "Opacidad"
+        '
+        'BtnEliminar
+        '
+        Me.BtnEliminar.Location = New System.Drawing.Point(260, 90)
+        Me.BtnEliminar.Name = "BtnEliminar"
+        Me.BtnEliminar.Size = New System.Drawing.Size(105, 31)
+        Me.BtnEliminar.TabIndex = 13
+        Me.BtnEliminar.Text = "Eliminar"
+        '
+        'BtnOcultar
+        '
+        Me.BtnOcultar.Location = New System.Drawing.Point(260, 50)
+        Me.BtnOcultar.Name = "BtnOcultar"
+        Me.BtnOcultar.Size = New System.Drawing.Size(105, 31)
+        Me.BtnOcultar.TabIndex = 14
+        Me.BtnOcultar.Text = "Ocultar"
+        '
         'Form2
         '
-        Me.ClientSize = New System.Drawing.Size(250, 281)
+        Me.ClientSize = New System.Drawing.Size(386, 284)
+        Me.Controls.Add(Me.BtnOcultar)
+        Me.Controls.Add(Me.BtnEliminar)
+        Me.Controls.Add(Me.BtnOpacidad)
+        Me.Controls.Add(Me.BtnLoop)
+        Me.Controls.Add(Me.BtnMostrar)
         Me.Controls.Add(Me.ComboBox2)
         Me.Controls.Add(Me.Button1)
         Me.Controls.Add(Me.ComboBox1)
@@ -171,4 +221,10 @@ Partial Class Form2
     Friend WithEvents ComboBox1 As ComboBox
     Friend WithEvents Button1 As Button
     Friend WithEvents ComboBox2 As ComboBox
+
+    Friend WithEvents BtnMostrar As Button
+    Friend WithEvents BtnLoop As Button
+    Friend WithEvents BtnOpacidad As Button
+    Friend WithEvents BtnEliminar As Button
+    Friend WithEvents BtnOcultar As Button
 End Class

@@ -31,12 +31,12 @@ Public Class TextoConfig
 
 End Class
 
-Public Class form_webview
+Public Class Form_webview
     Private web As Microsoft.Web.WebView2.WinForms.WebView2
     Private server As New MiniServer()
-    Private WithEvents browser As GeckoWebBrowser
+    Private WithEvents Browser As GeckoWebBrowser
 
-    Private Async Sub form_webview_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+    Private Async Sub Form_webview_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         ' Iniciar mini servidor
 
         Me.TransparencyKey = Color.Lime
@@ -51,8 +51,9 @@ Public Class form_webview
     Nothing,
     New CoreWebView2EnvironmentOptions("--enable-gpu-rasterization --enable-zero-copy --ignore-gpu-blocklist --use-gl=d3d11 --enable-accelerated-video-decode")
 )
-        web = New Microsoft.Web.WebView2.WinForms.WebView2()
-        web.Dock = DockStyle.Fill
+        web = New Microsoft.Web.WebView2.WinForms.WebView2 With {
+            .Dock = DockStyle.Fill
+        }
         Me.Controls.Add(web)
         Me.StartPosition = FormStartPosition.Manual
         Me.Location = New Point(0, 0)
@@ -96,20 +97,20 @@ Public Class form_webview
 
         ' Crear objeto de configuración
         Dim config = New With {
-        .IdGrupo = IdGrupo,
-        .Id = Id,
+        IdGrupo,
+        Id,
         .Url = Url.Replace("\", "\\"),
-        .Texto = Texto,
-        .Ancho = Ancho,
-        .Alto = Alto,
-        .PosX = PosX,
-        .PosY = PosY,
-        .NivelCapa = NivelCapa,
-        .Opacidad = Opacidad,
-        .Retraso = Retraso,
-        .FadeIn = FadeIn,
-        .FadeOut = FadeOut,
-        .ObjectFit = ObjectFit
+        Texto,
+        Ancho,
+        Alto,
+        PosX,
+        PosY,
+        NivelCapa,
+        Opacidad,
+        Retraso,
+        FadeIn,
+        FadeOut,
+        ObjectFit
     }
 
         ' Serializar a JSON usando Newtonsoft
@@ -120,8 +121,27 @@ Public Class form_webview
 
 
     End Sub
+    Public Async Sub DLL_SetVideoBucle(id As String, valor As Boolean)
+        Await web.CoreWebView2.ExecuteScriptAsync($"setVideoBucle('{id}', {valor.ToString().ToLower()});")
+    End Sub
 
-    Public Async Sub clearAllElements()
+    Public Async Sub DLL_CambiaOpacidad(id As String, valor As Integer)
+        Await web.CoreWebView2.ExecuteScriptAsync($"cambiaOpacidad('{id}', {valor});")
+    End Sub
+
+    Public Async Sub DLL_OcultaObjeto(id As String)
+        Await web.CoreWebView2.ExecuteScriptAsync($"ocultaObjeto('{id}');")
+    End Sub
+
+    Public Async Sub DLL_MostrarObjeto(id As String)
+        Await web.CoreWebView2.ExecuteScriptAsync($"mostrarObjeto('{id}');")
+    End Sub
+
+    Public Async Sub DLL_EliminaObjeto(id As String)
+        Await web.CoreWebView2.ExecuteScriptAsync($"eliminaObjeto('{id}');")
+    End Sub
+
+    Public Async Sub ClearAllElements()
 
 
         Await web.CoreWebView2.ExecuteScriptAsync($"clearAllElements();")
@@ -130,7 +150,7 @@ Public Class form_webview
     End Sub
 
 
-    Private Sub form_webview_FormClosing(sender As Object, e As FormClosingEventArgs) Handles Me.FormClosing
+    Private Sub Form_webview_FormClosing(sender As Object, e As FormClosingEventArgs) Handles Me.FormClosing
         server.StopServer()
     End Sub
 End Class
@@ -170,8 +190,6 @@ Public Class MiniServer
     End Function
 
     Public Sub StopServer()
-        If server IsNot Nothing Then
-            server.Dispose()
-        End If
+        server?.Dispose()
     End Sub
 End Class

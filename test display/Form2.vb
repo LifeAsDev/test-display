@@ -1,5 +1,6 @@
 ﻿Public Class Form2
     Inherits Form
+    Private ultimoId As String = "" ' guarda el último Id agregado
 
     Private webForm As New form_webview
 
@@ -8,6 +9,12 @@
         AddHandler BtnAgregar.Click, AddressOf BtnAgregar_Click
         AddHandler BtnTexto.Click, AddressOf BtnAgregarTexto_Click
         AddHandler BtnClear.Click, Sub() webForm.clearAllElements()
+
+        AddHandler BtnLoop.Click, AddressOf BtnSetVideoBucle_Click
+        AddHandler BtnOpacidad.Click, AddressOf BtnCambiaOpacidad_Click
+        AddHandler BtnOcultar.Click, AddressOf BtnOcultaObjeto_Click
+        AddHandler BtnMostrar.Click, AddressOf BtnMostrarObjeto_Click
+        AddHandler BtnEliminar.Click, AddressOf BtnEliminaObjeto_Click
 
         ' Posicionar ventana secundaria
         Me.Left = webForm.Width + 20
@@ -24,8 +31,9 @@
 
     Private Sub BtnAgregar_Click(sender As Object, e As EventArgs)
         ' Abrir OpenFileDialog
-        Dim ofd As New OpenFileDialog()
-        ofd.Filter = "Archivos multimedia|*.png;*.jpg;*.gif;*.mp4;*.avi;*.webm|Todos los archivos|*.*"
+        Dim ofd As New OpenFileDialog With {
+            .Filter = "Archivos multimedia|*.png;*.jpg;*.gif;*.mp4;*.avi;*.webm|Todos los archivos|*.*"
+        }
         If ofd.ShowDialog() <> DialogResult.OK Then Return
 
         ' Obtener valores de los NUD del Designer
@@ -36,11 +44,12 @@
         Dim opacidad = CInt(NUDOpacidad.Value)
         Dim url = CopyToTempAndGetUrl(ofd.FileName)
         Dim objectFitSeleccionado As String = ComboBox2.SelectedItem.ToString()
+        ultimoId = Guid.NewGuid().ToString()
 
         'enviar al webview
         webForm.AgregarObjetoDisplay(
         IdGrupo:="grupo1",
-        Id:=Guid.NewGuid().ToString(),
+        Id:=ultimoId,
         Url:=url,
            Ancho:=ancho,
         Alto:=alto,
@@ -57,8 +66,9 @@
 
     Private Sub BtnAgregarTest_Click(sender As Object, e As EventArgs) Handles Button1.Click
         ' Abrir OpenFileDialog
-        Dim ofd As New OpenFileDialog()
-        ofd.Filter = "Archivos multimedia|*.png;*.jpg;*.gif;*.mp4;*.avi;*.webm|Todos los archivos|*.*"
+        Dim ofd As New OpenFileDialog With {
+            .Filter = "Archivos multimedia|*.png;*.jpg;*.gif;*.mp4;*.avi;*.webm|Todos los archivos|*.*"
+        }
         If ofd.ShowDialog() <> DialogResult.OK Then Return
 
         ' Obtener valores de los NUD del Designer
@@ -138,4 +148,34 @@
     Private Sub ComboBox2_SelectedIndexChanged(sender As Object, e As EventArgs) Handles ComboBox2.SelectedIndexChanged
 
     End Sub
+    Private Sub BtnSetVideoBucle_Click(sender As Object, e As EventArgs)
+        If ultimoId <> "" Then
+            webForm.DLL_SetVideoBucle(ultimoId, False) ' True = con loop
+        End If
+    End Sub
+
+    Private Sub BtnCambiaOpacidad_Click(sender As Object, e As EventArgs)
+        If ultimoId <> "" Then
+            webForm.DLL_CambiaOpacidad(ultimoId, 50) ' 50% de opacidad
+        End If
+    End Sub
+
+    Private Sub BtnOcultaObjeto_Click(sender As Object, e As EventArgs)
+        If ultimoId <> "" Then
+            webForm.DLL_OcultaObjeto(ultimoId)
+        End If
+    End Sub
+
+    Private Sub BtnMostrarObjeto_Click(sender As Object, e As EventArgs)
+        If ultimoId <> "" Then
+            webForm.DLL_MostrarObjeto(ultimoId)
+        End If
+    End Sub
+
+    Private Sub BtnEliminaObjeto_Click(sender As Object, e As EventArgs)
+        If ultimoId <> "" Then
+            webForm.DLL_EliminaObjeto(ultimoId)
+        End If
+    End Sub
+
 End Class

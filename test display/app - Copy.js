@@ -48,14 +48,15 @@ function agregarObjetoDisplay(config) {
             console.warn("Formato no soportado:", Url);
             return;
         }
-    } else if (Texto) {
+    } else if (Texto) {        const uniqueUrl = Url + (Url.includes("?") ? "&" : "?") + "v=" + Date.now();
+
         // Crear elemento de texto
         elemento = document.createElement("div");
         //  elemento.textContent = Texto.Contenido || ""
         elemento.innerHTML = Texto.Contenido || "";
-       // elemento.style.color = Texto.Color || "#fff";
+      elemento.style.color = Texto.Color || "#fff";
         elemento.style.fontSize = (Texto.FontSize || 24) + "px";
-     //   elemento.style.fontWeight = Texto.FontWeight || "normal";
+        elemento.style.fontWeight = Texto.FontWeight || "normal";
         elemento.style.fontFamily = Texto.FontFamily || "sans-serif";
         elemento.style.whiteSpace = "pre-wrap"; // para soportar saltos de línea
         if (Texto.Align === "center") {
@@ -279,4 +280,45 @@ function transformarDivASlashed(element) {
     element.appendChild(bot);
 
     return element;
+}
+
+
+function setVideoBucle(id, valor) {
+    const obj = elementosMap.get(id);
+    if (obj && obj.nodo && obj.nodo.tagName === "VIDEO") {
+        obj.nodo.loop = valor; // true = con loop, false = sin loop
+        if (valor) obj.nodo.play().catch(err => {
+            console.warn("No se pudo reproducir el video:", err);
+        });
+    }
+}
+
+function cambiaOpacidad(id, valor) {
+    const obj = elementosMap.get(id);
+    if (obj && obj.nodo) {
+        obj.nodo.style.opacity = (valor / 100).toString();
+     
+    }
+}
+
+function ocultaObjeto(id) {
+    const obj = elementosMap.get(id);
+    if (obj && obj.nodo) {
+        obj.nodo.style.display = "none";
+    }
+}
+
+function mostrarObjeto(id) {
+    const obj = elementosMap.get(id);
+    if (obj && obj.nodo) {
+        obj.nodo.style.display = "";
+    }
+}
+
+function eliminaObjeto(id) {
+    const obj = elementosMap.get(id);
+    if (obj && obj.nodo) {
+        obj.nodo.remove();
+        elementosMap.delete(id); // limpiar del mapa también
+    }
 }
