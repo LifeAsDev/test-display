@@ -11,15 +11,23 @@ Imports Microsoft.Web.WebView2.Core
 Imports Microsoft.Web.WebView2.WinForms
 Imports Newtonsoft.Json
 Imports Gecko
+Public Enum ObjectFitOption
+    Fill
+    Contain
+    Cover
+    None
+    ScaleDown
+End Enum
 
 Public Class TextoConfig
     Public Property Contenido As String
     Public Property Color As String
     Public Property FontSize As Integer
-     Public  Property FontWeight As String
+    Public Property FontWeight As String
     Public Property FontFamily As String
     Public Property Align As String
     Public Property Efecto As Integer
+
 
 End Class
 
@@ -81,7 +89,10 @@ Public Class form_webview
         Optional Opacidad As Integer = 100,
         Optional Retraso As Integer = 0,
         Optional FadeIn As Integer = 0,
-        Optional FadeOut As Integer = 0)
+        Optional FadeOut As Integer = 0,
+        Optional ObjectFit As String = "contain")
+
+
 
         ' Crear objeto de configuración
         Dim config = New With {
@@ -97,7 +108,8 @@ Public Class form_webview
         .Opacidad = Opacidad,
         .Retraso = Retraso,
         .FadeIn = FadeIn,
-        .FadeOut = FadeOut
+        .FadeOut = FadeOut,
+        .ObjectFit = ObjectFit
     }
 
         ' Serializar a JSON usando Newtonsoft

@@ -17,6 +17,7 @@
         webForm.Top = 0
         webForm.ShowInTaskbar = True
         ComboBox1.SelectedIndex = 0
+        ComboBox2.SelectedIndex = 0
 
         webForm.Show()
     End Sub
@@ -34,6 +35,7 @@
         Dim alto = CInt(NUDAlto.Value)
         Dim opacidad = CInt(NUDOpacidad.Value)
         Dim url = CopyToTempAndGetUrl(ofd.FileName)
+        Dim objectFitSeleccionado As String = ComboBox2.SelectedItem.ToString()
 
         'enviar al webview
         webForm.AgregarObjetoDisplay(
@@ -48,7 +50,8 @@
           Opacidad:=opacidad,
         Retraso:=500,
         FadeIn:=500,
-        FadeOut:=0
+        FadeOut:=0,
+        ObjectFit:=objectFitSeleccionado
         )
     End Sub
 
@@ -65,6 +68,7 @@
         Dim alto = CInt(NUDAlto.Value)
         Dim opacidad = CInt(NUDOpacidad.Value)
         Dim url = CopyToTempAndGetUrl(ofd.FileName)
+        Dim objectFitSeleccionado As String = ComboBox2.SelectedItem.ToString()
 
         ' Hacer un loop de 1 a 10 para agregar múltiples objetos
         For i As Integer = 1 To 10
@@ -80,7 +84,8 @@
             Opacidad:=opacidad,
             Retraso:=500,
             FadeIn:=500,
-            FadeOut:=0
+            FadeOut:=0,
+            ObjectFit:=objectFitSeleccionado
         )
         Next
     End Sub
@@ -98,6 +103,7 @@
             Return
         End If
         Dim efectoSeleccionado As Integer = ComboBox1.SelectedIndex
+        Dim objectFitSeleccionado As String = ComboBox2.SelectedItem.ToString()
 
         ' Enviar al WebView como objeto de texto
         webForm.AgregarObjetoDisplay(
@@ -120,11 +126,16 @@
             Opacidad:=opacidad,
             Retraso:=0,
             FadeIn:=400,
-            FadeOut:=0
+            FadeOut:=0,
+            ObjectFit:=objectFitSeleccionado
         )
     End Sub
 
     Private Sub ComboBox1_SelectedIndexChanged(sender As Object, e As EventArgs) Handles ComboBox1.SelectedIndexChanged
+
+    End Sub
+
+    Private Sub ComboBox2_SelectedIndexChanged(sender As Object, e As EventArgs) Handles ComboBox2.SelectedIndexChanged
 
     End Sub
 End Class

@@ -17,6 +17,7 @@ Partial Class Form2
         Me.BtnClear = New System.Windows.Forms.Button()
         Me.ComboBox1 = New System.Windows.Forms.ComboBox()
         Me.Button1 = New System.Windows.Forms.Button()
+        Me.ComboBox2 = New System.Windows.Forms.ComboBox()
         CType(Me.NUDPosX, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.NUDPosY, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.NUDAncho, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -106,7 +107,7 @@ Partial Class Form2
         Me.ComboBox1.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.ComboBox1.FormattingEnabled = True
         Me.ComboBox1.Items.AddRange(New Object() {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"})
-        Me.ComboBox1.Location = New System.Drawing.Point(136, 206)
+        Me.ComboBox1.Location = New System.Drawing.Point(136, 200)
         Me.ComboBox1.Name = "ComboBox1"
         Me.ComboBox1.Size = New System.Drawing.Size(102, 21)
         Me.ComboBox1.TabIndex = 8
@@ -120,9 +121,21 @@ Partial Class Form2
         Me.Button1.Text = "Prueba Media x10"
         Me.Button1.UseVisualStyleBackColor = True
         '
+        'ComboBox2
+        '
+        Me.ComboBox2.DisplayMember = "0"
+        Me.ComboBox2.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.ComboBox2.FormattingEnabled = True
+        Me.ComboBox2.Items.AddRange(New Object() {"fill", "contain", "cover", "none", "scale-down"})
+        Me.ComboBox2.Location = New System.Drawing.Point(136, 240)
+        Me.ComboBox2.Name = "ComboBox2"
+        Me.ComboBox2.Size = New System.Drawing.Size(102, 21)
+        Me.ComboBox2.TabIndex = 10
+        '
         'Form2
         '
         Me.ClientSize = New System.Drawing.Size(250, 281)
+        Me.Controls.Add(Me.ComboBox2)
         Me.Controls.Add(Me.Button1)
         Me.Controls.Add(Me.ComboBox1)
         Me.Controls.Add(Me.BtnTexto)
@@ -157,4 +170,5 @@ Partial Class Form2
     Friend WithEvents BtnClear As Button
     Friend WithEvents ComboBox1 As ComboBox
     Friend WithEvents Button1 As Button
+    Friend WithEvents ComboBox2 As ComboBox
 End Class

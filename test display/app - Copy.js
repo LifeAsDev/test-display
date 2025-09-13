@@ -16,7 +16,8 @@ function agregarObjetoDisplay(config) {
         Opacidad = 100,
         Retraso = 0,
         FadeIn = 0,
-        FadeOut = 0
+        FadeOut = 0,
+        ObjectFit = "contain"
     } = config;
 
     const container = document.getElementById("image-container") || document.body;
@@ -93,7 +94,7 @@ function agregarObjetoDisplay(config) {
     } else {
         elemento.style.height = "auto";
     }
-
+    elemento.style.objectFit = ObjectFit
     elemento.style.zIndex = NivelCapa;
     elemento.style.opacity = "0"; // inicia invisible
     elemento.style.transition = (elemento.style.transition ? elemento.style.transition + ', ' : '') + `opacity ${FadeIn}ms ease-in`;
@@ -231,17 +232,18 @@ function aplicarEfecto(elemento, efecto) {
 
         case 9:
             elemento.classList.add("warningEffect"); break;
-
         case 10:
             elemento.classList.add("smokemonster");
             const smokeText = elemento.textContent;
             elemento.textContent = "";
 
-            smokeText.split("").forEach(letra => {
+            smokeText.split("").forEach((letra, i) => {
                 const span = document.createElement("span");
                 span.textContent = letra;
+                span.style.setProperty("--i", i); // índice dinámico
                 elemento.appendChild(span);
-            }); break;
+            });
+            break;
         case 11:
             elemento.classList.add("fantasma");
             elemento.setAttribute("data-text", elemento.textContent);
