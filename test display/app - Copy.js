@@ -36,11 +36,12 @@ function agregarObjetoDisplay(config) {
 
         if (["png", "jpg", "jpeg", "gif", "webp"].includes(ext)) {
             elemento = document.createElement("img");
-            elemento.src = uniqueUrl;
+            loadWithRetry(elemento, uniqueUrl, 5, 700);
         } else if (["mp4", "webm", "ogg", "avi"].includes(ext)) {
             video = true;
             elemento = document.createElement("video");
-            elemento.src = uniqueUrl;
+
+            loadWithRetry(elemento, uniqueUrl, 5, 700);
             elemento.autoplay = false;
             elemento.muted = false;
             elemento.loop = true;
@@ -101,31 +102,38 @@ function agregarObjetoDisplay(config) {
     elemento.style.transition = (elemento.style.transition ? elemento.style.transition + ', ' : '') + `opacity ${FadeIn}ms ease-in`;
 
 
-    // Retraso para mostrar
-    setTimeout(() => {
-        elemento.style.opacity = (Opacidad / 100).toString();
-        if (video) {
-            elemento.play();
-        }
-        if (Texto) {
-            if (Texto.Efecto === 10) {
-                setTimeout(() => {
+    function mostrarElemento() {
+        setTimeout(() => {
+            elemento.style.opacity = (Opacidad / 100).toString();
+
+            if (video) {
+                elemento.play();
+            }
+
+            if (Texto) {
+                if (Texto.Efecto === 10) {
+                    setTimeout(() => {
+                        aplicarEfecto(elemento, Texto.Efecto || 0);
+                    }, FadeIn);
+                } else {
                     aplicarEfecto(elemento, Texto.Efecto || 0);
-                }, FadeIn)
+                }
             }
-            else {
-                aplicarEfecto(elemento, Texto.Efecto || 0);
+
+            // FadeOut si corresponde
+            if (FadeOut > 0) {
+                setTimeout(() => {
+                    elemento.style.transition = `opacity 0.1s ease-out`;
+                    elemento.style.opacity = "0";
+                }, FadeOut);
             }
-        }
-     
-        // FadeOut si corresponde
-        if (FadeOut > 0) {
-            setTimeout(() => {
-                elemento.style.transition = `opacity ${.1}s ease-out`;
-                elemento.style.opacity = "0";
-            }, FadeOut); 
-        }
-    },Math.max( Retraso,10));
+        }, Math.max(Retraso, 10));
+    }
+
+    if (Url) {
+        if (video) elemento.oncanplaythrough = () => mostrarElemento();
+        else elemento.onload = () => mostrarElemento();
+    } else mostrarElemento();
 
     container.appendChild(elemento);
 
@@ -321,4 +329,25 @@ function eliminaObjeto(id) {
         obj.nodo.remove();
         elementosMap.delete(id); // limpiar del mapa también
     }
+}
+
+function loadWithRetry(elemento, url, maxRetries = 3, delay = 1000) {
+    let attempts = 0;
+
+    function tryLoad() {
+        attempts++;
+        const uniqueUrl = url + (url.includes("?") ? "&" : "?") + "v=" + Date.now();
+        elemento.src = uniqueUrl;
+
+        elemento.onerror = () => {
+            if (attempts < maxRetries) {
+                console.warn(`Fallo al cargar (${attempts}), reintentando...`);
+                setTimeout(tryLoad, delay);
+            } else {
+                console.error(`No se pudo cargar después de ${maxRetries} intentos: ${url}`);
+            }
+        };
+    }
+
+    tryLoad();
 }

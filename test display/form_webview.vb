@@ -4,13 +4,15 @@ Imports System.Net.Mime
 Imports System.Text
 Imports System.Threading
 Imports EmbedIO
+Imports EmbedIO.Actions
 Imports EmbedIO.Files
 Imports EmbedIO.Utilities
 Imports EmbedIO.WebApi
+Imports Gecko
 Imports Microsoft.Web.WebView2.Core
 Imports Microsoft.Web.WebView2.WinForms
 Imports Newtonsoft.Json
-Imports Gecko
+
 Public Enum ObjectFitOption
     Fill
     Contain
@@ -38,10 +40,11 @@ Public Class Form_webview
 
     Private Async Sub Form_webview_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         ' Iniciar mini servidor
-
+        Me.Width = 1366
+        Me.Height = 768
         Me.TransparencyKey = Color.Lime
         Me.BackColor = Color.Lime
-        Me.TopMost = True
+        'Me.TopMost = True
         server.StartServer()
         Me.FormBorderStyle = FormBorderStyle.None
 
@@ -162,14 +165,31 @@ Public Class MiniServer
 
     Public Sub StartServer()
         Dim url As String = "http://localhost:5000/"
+        Dim logPath As String = "C:\Users\Angelo\Downloads\archivos test v7\server_errors.log"
 
         Try
-            server = New WebServer(HttpListenerMode.EmbedIO, url)
-            server.WithStaticFolder("/uploads", tempFolder, True)
-            ' Módulo para servir archivos estáticos (index.html, css, js)
-            server.WithStaticFolder("/", AppDomain.CurrentDomain.BaseDirectory, True)
+            server = New WebServer(HttpListenerMode.EmbedIO, url) _
+    .WithStaticFolder("/uploads", tempFolder, True) _
+    .WithStaticFolder("/", AppDomain.CurrentDomain.BaseDirectory, True)
+
+            server.WithModule(New ActionModule("/", HttpVerbs.Any,
+                Function(ctx As IHttpContext) As Task
+        Try
+            ' Dejar pasar la request, no hacemos nada aquí
+            Return Task.CompletedTask
+        Catch ex As Exception
+            ' Guardar log en archivo
+            Dim log = $"{DateTime.Now:yyyy-MM-dd HH:mm:ss} - ERROR: {ex.Message}{vbCrLf}{ex.StackTrace}{vbCrLf}"
+            File.AppendAllText(logPath, log, Encoding.UTF8)
+
+            ' No mandamos nada extra al cliente
+            Throw
+        End Try
+    End Function))
 
             server.RunAsync()
+
+
         Catch ex As Exception
             Debug.WriteLine("Ya hay un servidor corriendo en " & url)
             ' No lo inicias, solo sigues con la app
@@ -193,3 +213,4 @@ Public Class MiniServer
         server?.Dispose()
     End Sub
 End Class
+
