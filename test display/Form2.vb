@@ -1,14 +1,16 @@
-﻿Public Class Form2
+﻿Imports System.Collections.Concurrent
+
+Public Class Form2
     Inherits Form
     Private ultimoId As String = "" ' guarda el último Id agregado
 
-    Private webForm As New form_webview
+    Private webForm As New Form_webview
 
     Private Sub Form2_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         ' Conectar eventos de los botones del Designer
         AddHandler BtnAgregar.Click, AddressOf BtnAgregar_Click
         AddHandler BtnTexto.Click, AddressOf BtnAgregarTexto_Click
-        AddHandler BtnClear.Click, Sub() webForm.clearAllElements()
+        AddHandler BtnClear.Click, Sub() webForm.ClearAllElements()
 
         AddHandler BtnLoop.Click, AddressOf BtnSetVideoBucle_Click
         AddHandler BtnOpacidad.Click, AddressOf BtnCambiaOpacidad_Click
@@ -42,7 +44,7 @@
         Dim ancho = CInt(NUDAncho.Value)
         Dim alto = CInt(NUDAlto.Value)
         Dim opacidad = CInt(NUDOpacidad.Value)
-        Dim url = CopyToTempAndGetUrl(ofd.FileName)
+        Dim url = webForm.AddDynamicFile(ofd.FileName)
         Dim objectFitSeleccionado As String = ComboBox2.SelectedItem.ToString()
         ultimoId = Guid.NewGuid().ToString()
 
@@ -105,44 +107,44 @@
 
 
         'fondo
-        webForm.AgregarObjetoDisplay(IdGrupo:="grupo0", Id:=Guid.NewGuid().ToString(), Url:=CopyToTempAndGetUrl("C:\Users\Angelo\Downloads\archivos test v7\fondo.jpeg"),
+        webForm.AgregarObjetoDisplay(IdGrupo:="grupo0", Id:=Guid.NewGuid().ToString(), Url:=webForm.AddDynamicFile("C:\Users\Angelo\Downloads\archivos test v72\fondo.png"),
 Ancho:=1248, Alto:=624,
 PosX:=0, PosY:=0,
 NivelCapa:=1, Opacidad:=100, Retraso:=0, FadeIn:=0, FadeOut:=0, ObjectFit:="fill")
 
         'mask
-        webForm.AgregarObjetoDisplay(IdGrupo:="grupo1", Id:=Guid.NewGuid().ToString(), Url:=CopyToTempAndGetUrl("C:\Users\Angelo\Downloads\archivos test v7\bossDesign1.webp"),
+        webForm.AgregarObjetoDisplay(IdGrupo:="grupo1", Id:=Guid.NewGuid().ToString(), Url:=webForm.AddDynamicFile("C:\Users\Angelo\Downloads\archivos test v72\mask.png"),
 Ancho:=1248, Alto:=624,
 PosX:=0, PosY:=0,
 NivelCapa:=2, Opacidad:=100, Retraso:=0, FadeIn:=0, FadeOut:=0)
 
         'prc
-        webForm.AgregarObjetoDisplay(IdGrupo:="grupo1", Id:=Guid.NewGuid().ToString(), Url:=CopyToTempAndGetUrl("C:\Users\Angelo\Downloads\archivos test v7\v1.webm"),
+        webForm.AgregarObjetoDisplay(IdGrupo:="grupo1", Id:=Guid.NewGuid().ToString(), Url:=webForm.AddDynamicFile("C:\Users\Angelo\Downloads\archivos test v72\precioled.webm"),
 Ancho:=450, Alto:=450,
 PosX:=-90, PosY:=100,
 NivelCapa:=5, Opacidad:=100, Retraso:=0, FadeIn:=1000, FadeOut:=0)
 
         'uda
-        webForm.AgregarObjetoDisplay(IdGrupo:="grupo1", Id:=Guid.NewGuid().ToString(), Url:=CopyToTempAndGetUrl("C:\Users\Angelo\Downloads\archivos test v7\uda.webm"),
+        webForm.AgregarObjetoDisplay(IdGrupo:="grupo1", Id:=Guid.NewGuid().ToString(), Url:=webForm.AddDynamicFile("C:\Users\Angelo\Downloads\archivos test v72\uda.webm"),
 Ancho:=450, Alto:=450,
 PosX:=870, PosY:=100,
 NivelCapa:=5, Opacidad:=100, Retraso:=0, FadeIn:=1000, FadeOut:=0)
 
 
         'pepsi1
-        webForm.AgregarObjetoDisplay(IdGrupo:="grupo1", Id:=Guid.NewGuid().ToString(), Url:=CopyToTempAndGetUrl("C:\Users\Angelo\Downloads\archivos test v7\pepsi.webm"),
+        webForm.AgregarObjetoDisplay(IdGrupo:="grupo1", Id:=Guid.NewGuid().ToString(), Url:=webForm.AddDynamicFile("C:\Users\Angelo\Downloads\archivos test v72\pepsi.webm"),
 Ancho:=80, Alto:=80,
 PosX:=124, PosY:=10,
 NivelCapa:=10, Opacidad:=100, Retraso:=0, FadeIn:=1000, FadeOut:=0)
 
         'pepsi2
-        webForm.AgregarObjetoDisplay(IdGrupo:="grupo1", Id:=Guid.NewGuid().ToString(), Url:=CopyToTempAndGetUrl("C:\Users\Angelo\Downloads\archivos test v7\pepsi.webm"),
+        webForm.AgregarObjetoDisplay(IdGrupo:="grupo1", Id:=Guid.NewGuid().ToString(), Url:=webForm.AddDynamicFile("C:\Users\Angelo\Downloads\archivos test v72\pepsi.webm"),
 Ancho:=80, Alto:=80,
 PosX:=1044, PosY:=10,
 NivelCapa:=10, Opacidad:=100, Retraso:=0, FadeIn:=1000, FadeOut:=0)
 
         'animar
-        webForm.AgregarObjetoDisplay(IdGrupo:="grupo1", Id:=Guid.NewGuid().ToString(), Url:=CopyToTempAndGetUrl("C:\Users\Angelo\Downloads\archivos test v7\gato.webm"),
+        webForm.AgregarObjetoDisplay(IdGrupo:="grupo1", Id:=Guid.NewGuid().ToString(), Url:=webForm.AddDynamicFile("C:\Users\Angelo\Downloads\archivos test v72\animo.webm"),
 Ancho:=1248, Alto:=300,
 PosX:=0, PosY:=330,
 NivelCapa:=10, Opacidad:=100, Retraso:=0, FadeIn:=1000, FadeOut:=0)
@@ -236,6 +238,8 @@ NivelCapa:=10, Opacidad:=100, Retraso:=0, FadeIn:=1000, FadeOut:=0)
         '    ObjectFit:=objectFitSeleccionado
         ')
     End Sub
+
+
 
     Private Sub ComboBox1_SelectedIndexChanged(sender As Object, e As EventArgs) Handles ComboBox1.SelectedIndexChanged
 

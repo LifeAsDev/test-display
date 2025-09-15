@@ -1,4 +1,5 @@
-﻿Imports System.Diagnostics
+﻿Imports System.Collections.Concurrent
+Imports System.Diagnostics
 Imports System.IO
 Imports System.Net.Mime
 Imports System.Text
@@ -8,10 +9,10 @@ Imports EmbedIO.Actions
 Imports EmbedIO.Files
 Imports EmbedIO.Utilities
 Imports EmbedIO.WebApi
-Imports Gecko
 Imports Microsoft.Web.WebView2.Core
 Imports Microsoft.Web.WebView2.WinForms
 Imports Newtonsoft.Json
+Imports IOF = System.IO
 
 Public Enum ObjectFitOption
     Fill
@@ -36,12 +37,18 @@ End Class
 Public Class Form_webview
     Private web As Microsoft.Web.WebView2.WinForms.WebView2
     Private server As New MiniServer()
-    Private WithEvents Browser As GeckoWebBrowser
+
+    Public Function AddDynamicFile(originalFile As String) As String
+        Dim ext = IO.Path.GetExtension(originalFile).ToLowerInvariant()
+        Dim fileId = Guid.NewGuid().ToString() & ext
+        MiniServer.DynamicFiles(fileId) = originalFile
+        Return $"http://localhost:5000/file/{fileId}"
+    End Function
 
     Private Async Sub Form_webview_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         ' Iniciar mini servidor
-        Me.Width = 1366
-        Me.Height = 768
+        Me.Width = 1920
+        Me.Height = 1080
         Me.TransparencyKey = Color.Lime
         Me.BackColor = Color.Lime
         'Me.TopMost = True
@@ -162,30 +169,53 @@ End Class
 Public Class MiniServer
     Private server As WebServer
     Private ReadOnly tempFolder As String = Path.Combine(Path.GetTempPath(), "MiniServerUploads")
+    Public Shared ReadOnly DynamicFiles As New ConcurrentDictionary(Of String, String)
 
     Public Sub StartServer()
         Dim url As String = "http://localhost:5000/"
         Dim logPath As String = "C:\Users\Angelo\Downloads\archivos test v7\server_errors.log"
 
         Try
-            server = New WebServer(HttpListenerMode.EmbedIO, url) _
-    .WithStaticFolder("/uploads", tempFolder, True) _
-    .WithStaticFolder("/", AppDomain.CurrentDomain.BaseDirectory, True)
+            server = New WebServer(HttpListenerMode.EmbedIO, url)
+            server.WithModule(New ActionModule("/file", HttpVerbs.Get,
+    Async Function(ctx As IHttpContext) As Task
+        ' Extraer solo el nombre del archivo desde la URL
 
-            server.WithModule(New ActionModule("/", HttpVerbs.Any,
-                Function(ctx As IHttpContext) As Task
-        Try
-            ' Dejar pasar la request, no hacemos nada aquí
-            Return Task.CompletedTask
-        Catch ex As Exception
-            ' Guardar log en archivo
-            Dim log = $"{DateTime.Now:yyyy-MM-dd HH:mm:ss} - ERROR: {ex.Message}{vbCrLf}{ex.StackTrace}{vbCrLf}"
-            File.AppendAllText(logPath, log, Encoding.UTF8)
 
-            ' No mandamos nada extra al cliente
-            Throw
-        End Try
+        Dim id = IO.Path.GetFileName(ctx.RequestedPath)
+        Dim realPath As String = Nothing
+
+        If dynamicFiles.TryGetValue(id, realPath) AndAlso IO.File.Exists(realPath) Then
+            ' Detectar MIME según la extensión real del archivo
+            Dim ext = IO.Path.GetExtension(realPath).ToLowerInvariant()
+            Dim mime As String = "application/octet-stream"
+            Select Case ext
+                Case ".jpg", ".jpeg" : mime = "image/jpeg"
+                Case ".png" : mime = "image/png"
+                Case ".gif" : mime = "image/gif"
+                Case ".webp" : mime = "image/webp"
+                Case ".mp4" : mime = "video/mp4"
+                Case ".webm" : mime = "video/webm"
+                Case ".avi" : mime = "video/x-msvideo"
+            End Select
+
+            ctx.Response.ContentType = mime
+
+            ' Stream manual
+            Using fs As New IO.FileStream(realPath, IO.FileMode.Open, IO.FileAccess.Read, IO.FileShare.Read)
+                Await fs.CopyToAsync(ctx.Response.OutputStream)
+            End Using
+
+            ctx.Response.StatusCode = 200
+        Else
+            ctx.Response.StatusCode = 404
+        End If
+
     End Function))
+
+
+            server.WithStaticFolder("/", AppDomain.CurrentDomain.BaseDirectory, True)
+
 
             server.RunAsync()
 
@@ -196,18 +226,6 @@ Public Class MiniServer
         End Try
     End Sub
 
-    Private Function GetMimeType(filePath As String) As String
-        Select Case Path.GetExtension(filePath).ToLower()
-            Case ".png" : Return "image/png"
-            Case ".jpg", ".jpeg" : Return "image/jpeg"
-            Case ".gif" : Return "image/gif"
-            Case ".webp" : Return "image/webp"
-            Case ".bmp" : Return "image/bmp"
-            Case ".mp4" : Return "video/mp4"
-            Case ".avi" : Return "video/x-msvideo"
-            Case Else : Return "application/octet-stream"
-        End Select
-    End Function
 
     Public Sub StopServer()
         server?.Dispose()

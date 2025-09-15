@@ -41,7 +41,7 @@ function agregarObjetoDisplay(config) {
             video = true;
             elemento = document.createElement("video");
 
-            loadWithRetry(elemento, uniqueUrl, 5, 700);
+            loadWithRetry(elemento, uniqueUrl, 5, 100);
             elemento.autoplay = false;
             elemento.muted = false;
             elemento.loop = true;

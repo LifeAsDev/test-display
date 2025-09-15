@@ -1,4 +1,5 @@
-﻿Imports System.IO
+﻿Imports System.Collections.Concurrent
+Imports System.IO
 
 Public Module FileHelper
     Private ReadOnly tempFolder As String = Path.Combine(Path.GetTempPath(), "MiniServerUploads")
