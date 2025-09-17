@@ -79,7 +79,7 @@ Public Class Form2
         Dim ancho = CInt(NUDAncho.Value)
         Dim alto = CInt(NUDAlto.Value)
         Dim opacidad = CInt(NUDOpacidad.Value)
-        Dim url = CopyToTempAndGetUrl(ofd.FileName)
+        Dim url = webForm.AddDynamicFile(ofd.FileName)
         Dim objectFitSeleccionado As String = ComboBox2.SelectedItem.ToString()
 
         ' Hacer un loop de 1 a 10 para agregar múltiples objetos
