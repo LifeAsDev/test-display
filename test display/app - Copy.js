@@ -54,8 +54,9 @@ function agregarObjetoDisplay(config) {
         // Crear elemento de texto
         elemento = document.createElement("div");
         //  elemento.textContent = Texto.Contenido || ""
+        console.log(Texto.Contenido);
         elemento.innerHTML = Texto.Contenido || "";
-      elemento.style.color = Texto.Color || "#fff";
+        elemento.style.color = Texto.Color || "#fff";
         elemento.style.fontSize = (Texto.FontSize || 24) + "px";
         elemento.style.fontWeight = Texto.FontWeight || "normal";
         elemento.style.fontFamily = Texto.FontFamily || "sans-serif";
@@ -113,7 +114,7 @@ function agregarObjetoDisplay(config) {
             if (Texto) {
                 if (Texto.Efecto === 10) {
                     setTimeout(() => {
-                        aplicarEfecto(elemento, Texto.Efecto || 0);
+                        aplicarEfecto(elemento, Texto.Efecto || 0, Texto.Contenido);
                     }, FadeIn);
                 } else {
                     aplicarEfecto(elemento, Texto.Efecto || 0);
@@ -152,38 +153,81 @@ function clearAllElements() {
 
 
 
-function aplicarEfecto(elemento, efecto) {
+function aplicarEfecto(elemento, efecto,innerHtml) {
     let inner;
 
     switch (efecto) {
-        case 1: // Máquina de escribir
-            const texto = elemento.textContent;
-            elemento.textContent = "";
-            let i = 0;
-            function maquina() {
-                if (i < texto.length) {
-                    elemento.textContent += texto[i];
-                    i++;
-                    setTimeout(maquina, 100);
+        case 1: { // Máquina de escribir que respeta HTML
+            const velocidad = 100; // ms por carácter (ajusta)
+            const html = elemento.innerHTML;
+            elemento.innerHTML = ""; // limpiamos el contenedor visual
+
+            // parseamos el HTML original
+            const temp = document.createElement("div");
+            temp.innerHTML = html;
+
+            const steps = [];
+
+            // recorre el DOM original y crea la estructura (sin texto),
+            // acumulando pasos para insertar los caracteres en los parents adecuados
+            function traverse(node, parentTarget) {
+                if (node.nodeType === Node.ELEMENT_NODE) {
+                    // crear elemento sin hijos, copiar atributos
+                    const el = document.createElement(node.tagName);
+                    for (let i = 0; i < node.attributes.length; i++) {
+                        const att = node.attributes[i];
+                        el.setAttribute(att.name, att.value);
+                    }
+                    parentTarget.appendChild(el);
+
+                    // recorrer hijos con este nuevo elemento como parent
+                    Array.from(node.childNodes).forEach((child) => traverse(child, el));
+                } else if (node.nodeType === Node.TEXT_NODE) {
+                    const text = node.nodeValue || "";
+                    // cada carácter es un paso que añade un TextNode al parentTarget
+                    for (const ch of text) {
+                        const char = ch; // captura por valor
+                        steps.push(() => {
+                            parentTarget.appendChild(document.createTextNode(char));
+                        });
+                    }
                 }
+                // comentarios u otros nodos los ignoramos
             }
-            maquina();
+
+            // construir estructura vacía y steps
+            Array.from(temp.childNodes).forEach((child) => traverse(child, elemento));
+
+            // ejecutar los pasos secuencialmente
+            let idx = 0;
+            function runStep() {
+                if (idx >= steps.length) return;
+                steps[idx]();
+                idx++;
+                // opcional: acelerar espacios
+                const lastChar = (steps[idx - 1] && steps[idx - 1].toString()) || "";
+                const nextDelay = (lastChar === " " ? Math.max(20, velocidad / 3) : velocidad);
+                setTimeout(runStep, nextDelay);
+            }
+            runStep();
             break;
+        }
+
 
         case 2: // Caer desde arriba
             elemento.style.position = "absolute";
             elemento.style.transform = "translateY(-50px)";
-            elemento.style.transition = "all 1s";
             setTimeout(() => {
+                elemento.style.transition = "all 1s";
                 elemento.style.transform = "translateY(0)";
-            }, 50);
+            }, 100);
             break;
 
         case 3: // Desde izquierda
             elemento.style.position = "absolute";
             elemento.style.transform = "translateX(-50px)";
-            elemento.style.transition = "all 1s";
             setTimeout(() => {
+                elemento.style.transition = "all 1s";
                 elemento.style.transform = "translateX(0)";
             }, 50);
             break;
@@ -191,16 +235,16 @@ function aplicarEfecto(elemento, efecto) {
         case 4: // Desde derecha
             elemento.style.position = "absolute";
             elemento.style.transform = "translateX(50px)";
-            elemento.style.transition = "all 1s";
             setTimeout(() => {
+                elemento.style.transition = "all 1s";
                 elemento.style.transform = "translateX(0)";
             }, 50);
             break;
         case 5: // Caer desde arriba
             elemento.style.position = "absolute";
             elemento.style.transform = "translateY(50px)";
-            elemento.style.transition = "all 1s";
             setTimeout(() => {
+                elemento.style.transition = "all 1s";
                 elemento.style.transform = "translateY(0)";
             }, 50);
             break;
@@ -213,9 +257,9 @@ function aplicarEfecto(elemento, efecto) {
             elemento.appendChild(inner);
 
             inner.style.transform = "translateY(-100%)"; // empieza arriba
-            inner.style.transition = "transform 1.5s ease";
 
             setTimeout(() => {
+                inner.style.transition = "transform 1.5s ease";
                 inner.style.transform = "translateY(0)"; 
             }, 50);
             break;
@@ -229,9 +273,9 @@ function aplicarEfecto(elemento, efecto) {
             elemento.appendChild(inner);
 
             inner.style.transform = "translateY(100%)"; // empieza abajo
-            inner.style.transition = "transform 1.5s ease";
 
             setTimeout(() => {
+                inner.style.transition = "transform 1.5s ease";
                 inner.style.transform = "translateY(0)"; 
             }, 50);
             break;
@@ -243,16 +287,46 @@ function aplicarEfecto(elemento, efecto) {
             elemento.classList.add("warningEffect"); break;
         case 10:
             elemento.classList.add("smokemonster");
-            const smokeText = elemento.textContent;
-            elemento.textContent = "";
 
-            smokeText.split("").forEach((letra, i) => {
-                const span = document.createElement("span");
-                span.textContent = letra;
-                span.style.setProperty("--i", i); // índice dinámico
-                elemento.appendChild(span);
-            });
+            // Tomar el HTML real en lugar de textContent
+            const originalHTML = elemento.innerHTML;
+            elemento.innerHTML = "";
+
+            // Parsear HTML para mantener los spans originales
+            const temp = document.createElement("div");
+            temp.innerHTML = originalHTML;
+
+            function procesarNodo(node, parentTarget) {
+                if (node.nodeType === Node.ELEMENT_NODE) {
+                    // Mantener el elemento (ej: <span style="...">)
+                    const el = document.createElement(node.tagName);
+                    for (let i = 0; i < node.attributes.length; i++) {
+                        const att = node.attributes[i];
+                        el.setAttribute(att.name, att.value);
+                    }
+                    parentTarget.appendChild(el);
+
+                    // Procesar recursivamente los hijos de este nodo
+                    Array.from(node.childNodes).forEach((child) =>
+                        procesarNodo(child, el)
+                    );
+                } else if (node.nodeType === Node.TEXT_NODE) {
+                    const text = node.nodeValue || "";
+                    text.split("").forEach((letra, i) => {
+                        const span = document.createElement("span");
+                        span.textContent = letra;
+                        span.style.setProperty("--i", i); // índice dinámico
+                        parentTarget.appendChild(span);
+                    });
+                }
+            }
+
+            Array.from(temp.childNodes).forEach((child) =>
+                procesarNodo(child, elemento)
+            );
+
             break;
+
         case 11:
             elemento.classList.add("fantasma");
             elemento.setAttribute("data-text", elemento.textContent);
@@ -289,6 +363,7 @@ function transformarDivASlashed(element) {
 
     return element;
 }
+
 
 
 function setVideoBucle(id, valor) {
