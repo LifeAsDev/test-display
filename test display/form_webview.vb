@@ -51,7 +51,7 @@ Public Class Form_webview
         Me.Height = 1080
         Me.TransparencyKey = Color.Lime
         Me.BackColor = Color.Lime
-        'Me.TopMost = True
+        Me.TopMost = True
         server.StartServer()
         Me.FormBorderStyle = FormBorderStyle.None
 
@@ -71,7 +71,11 @@ Public Class Form_webview
         Await web.EnsureCoreWebView2Async(env)
 
         web.DefaultBackgroundColor = Color.Transparent ' <-- clave
-        web.CoreWebView2.Navigate("http://localhost:5000/")
+        'web.CoreWebView2.Navigate("http://localhost:5000/")
+        Dim htmlPath As String = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "index.html")
+
+        ' Navegar directamente al archivo local
+        web.CoreWebView2.Navigate("file:///" & htmlPath.Replace("\", "/"))
         'Xpcom.Initialize("C:\Users\Angelo\Desktop\project\test display\test display\Firefox\") ' <-- Cambia por tu ruta
 
         ' Crear el GeckoWebBrowser

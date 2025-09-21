@@ -44,7 +44,8 @@ Public Class Form2
         Dim ancho = CInt(NUDAncho.Value)
         Dim alto = CInt(NUDAlto.Value)
         Dim opacidad = CInt(NUDOpacidad.Value)
-        Dim url = webForm.AddDynamicFile(ofd.FileName)
+        Dim fileUri = New Uri(ofd.FileName)
+        Dim url = fileUri.AbsoluteUri
         Dim objectFitSeleccionado As String = ComboBox2.SelectedItem.ToString()
         ultimoId = Guid.NewGuid().ToString()
 
@@ -79,7 +80,7 @@ Public Class Form2
         Dim ancho = CInt(NUDAncho.Value)
         Dim alto = CInt(NUDAlto.Value)
         Dim opacidad = CInt(NUDOpacidad.Value)
-        Dim url = webForm.AddDynamicFile(ofd.FileName)
+        Dim url = GetFileUrl(ofd.FileName)
         Dim objectFitSeleccionado As String = ComboBox2.SelectedItem.ToString()
 
         ' Hacer un loop de 1 a 10 para agregar múltiples objetos
@@ -107,99 +108,48 @@ Public Class Form2
         Dim efectoSeleccionado As Integer = ComboBox1.SelectedIndex
 
 
-        '        'fondo
-        '        webForm.AgregarObjetoDisplay(IdGrupo:="grupo0", Id:=Guid.NewGuid().ToString(), Url:=webForm.AddDynamicFile("C:\Users\Angelo\Downloads\archivos test v72\fondo.png"),
-        'Ancho:=1248, Alto:=624,
-        'PosX:=0, PosY:=0,
-        'NivelCapa:=1, Opacidad:=100, Retraso:=0, FadeIn:=0, FadeOut:=0, ObjectFit:="fill")
+        'fondo
+        webForm.AgregarObjetoDisplay(IdGrupo:="grupo0", Id:=Guid.NewGuid().ToString(), Url:=GetFileUrl("C:\Users\Angelo\Downloads\archivos test v72\fondo.png"),
+        Ancho:=1248, Alto:=624,
+        PosX:=0, PosY:=0,
+        NivelCapa:=1, Opacidad:=100, Retraso:=0, FadeIn:=0, FadeOut:=0, ObjectFit:="fill")
 
-        '        'mask
-        '        webForm.AgregarObjetoDisplay(IdGrupo:="grupo1", Id:=Guid.NewGuid().ToString(), Url:=webForm.AddDynamicFile("C:\Users\Angelo\Downloads\archivos test v72\mask.png"),
-        'Ancho:=1248, Alto:=624,
-        'PosX:=0, PosY:=0,
-        'NivelCapa:=2, Opacidad:=100, Retraso:=0, FadeIn:=0, FadeOut:=0)
+        'mask
+        webForm.AgregarObjetoDisplay(IdGrupo:="grupo1", Id:=Guid.NewGuid().ToString(), Url:=GetFileUrl("C:\Users\Angelo\Downloads\archivos test v72\mask.png"),
+        Ancho:=1248, Alto:=624,
+        PosX:=0, PosY:=0,
+        NivelCapa:=2, Opacidad:=100, Retraso:=0, FadeIn:=0, FadeOut:=0)
 
-        '        'prc
-        '        webForm.AgregarObjetoDisplay(IdGrupo:="grupo1", Id:=Guid.NewGuid().ToString(), Url:=webForm.AddDynamicFile("C:\Users\Angelo\Downloads\archivos test v72\precioled.webm"),
-        'Ancho:=450, Alto:=450,
-        'PosX:=-90, PosY:=100,
-        'NivelCapa:=5, Opacidad:=100, Retraso:=0, FadeIn:=1000, FadeOut:=0)
+        'prc
+        webForm.AgregarObjetoDisplay(IdGrupo:="grupo1", Id:=Guid.NewGuid().ToString(), Url:=GetFileUrl("C:\Users\Angelo\Downloads\archivos test v72\precioled.webm"),
+        Ancho:=450, Alto:=450,
+        PosX:=-90, PosY:=100,
+        NivelCapa:=5, Opacidad:=100, Retraso:=0, FadeIn:=1000, FadeOut:=0)
 
-        '        'uda
-        '        webForm.AgregarObjetoDisplay(IdGrupo:="grupo1", Id:=Guid.NewGuid().ToString(), Url:=webForm.AddDynamicFile("C:\Users\Angelo\Downloads\archivos test v72\uda.webm"),
-        'Ancho:=450, Alto:=450,
-        'PosX:=870, PosY:=100,
-        'NivelCapa:=5, Opacidad:=100, Retraso:=0, FadeIn:=1000, FadeOut:=0)
-
-
-        '        'pepsi1
-        '        webForm.AgregarObjetoDisplay(IdGrupo:="grupo1", Id:=Guid.NewGuid().ToString(), Url:=webForm.AddDynamicFile("C:\Users\Angelo\Downloads\archivos test v72\pepsi.webm"),
-        'Ancho:=80, Alto:=80,
-        'PosX:=124, PosY:=10,
-        'NivelCapa:=10, Opacidad:=100, Retraso:=0, FadeIn:=1000, FadeOut:=0)
-
-        '        'pepsi2
-        '        webForm.AgregarObjetoDisplay(IdGrupo:="grupo1", Id:=Guid.NewGuid().ToString(), Url:=webForm.AddDynamicFile("C:\Users\Angelo\Downloads\archivos test v72\pepsi.webm"),
-        'Ancho:=80, Alto:=80,
-        'PosX:=1044, PosY:=10,
-        'NivelCapa:=10, Opacidad:=100, Retraso:=0, FadeIn:=1000, FadeOut:=0)
-
-        '        'animar
-        '        webForm.AgregarObjetoDisplay(IdGrupo:="grupo1", Id:=Guid.NewGuid().ToString(), Url:=webForm.AddDynamicFile("C:\Users\Angelo\Downloads\archivos test v72\animo.webm"),
-        'Ancho:=1248, Alto:=300,
-        'PosX:=0, PosY:=330,
-        'NivelCapa:=10, Opacidad:=100, Retraso:=0, FadeIn:=1000, FadeOut:=0)
+        'uda
+        webForm.AgregarObjetoDisplay(IdGrupo:="grupo1", Id:=Guid.NewGuid().ToString(), Url:=GetFileUrl("C:\Users\Angelo\Downloads\archivos test v72\uda.webm"),
+        Ancho:=450, Alto:=450,
+        PosX:=870, PosY:=100,
+        NivelCapa:=5, Opacidad:=100, Retraso:=0, FadeIn:=1000, FadeOut:=0)
 
 
-        '        '0
-        '        webForm.AgregarObjetoDisplay(IdGrupo:="grupo1", Id:=Guid.NewGuid().ToString(), Texto:=New TextoConfig With {
-        '        .Contenido = "0",
-        '        .Color = "white",
-        '        .FontSize = 330,
-        '        .FontWeight = "bold",
-        '        .FontFamily = "Montserrat",
-        '        .Align = "center",
-        '        .Efecto = 1},
-        '    Ancho:=0, Alto:=0,
-        '    PosX:=480,
-        '    PosY:=480,
-        '    NivelCapa:=12,
-        '    Opacidad:=100,
-        '    Retraso:=0, FadeIn:=400, FadeOut:=0)
+        'pepsi1
+        webForm.AgregarObjetoDisplay(IdGrupo:="grupo1", Id:=Guid.NewGuid().ToString(), Url:=GetFileUrl("C:\Users\Angelo\Downloads\archivos test v72\pepsi.webm"),
+        Ancho:=80, Alto:=80,
+        PosX:=124, PosY:=10,
+        NivelCapa:=10, Opacidad:=100, Retraso:=0, FadeIn:=1000, FadeOut:=0)
 
-        '        '0
-        '        webForm.AgregarObjetoDisplay(IdGrupo:="grupo1", Id:=Guid.NewGuid().ToString(), Texto:=New TextoConfig With {
-        '        .Contenido = "<span style='background-color:yellow;'>0</span>",
-        '        .Color = "white",
-        '        .FontSize = 330,
-        '        .FontWeight = "bold",
-        '        .FontFamily = "Montserrat",
-        '        .Align = "center",
-        '        .Efecto = efectoSeleccionado
-        '                                     },
-        '    Ancho:=0, Alto:=0,
-        '    PosX:=760,
-        '    PosY:=480,
-        '    NivelCapa:=12,
-        '    Opacidad:=100,
-        '    Retraso:=0, FadeIn:=400, FadeOut:=0)
+        'pepsi2
+        webForm.AgregarObjetoDisplay(IdGrupo:="grupo1", Id:=Guid.NewGuid().ToString(), Url:=GetFileUrl("C:\Users\Angelo\Downloads\archivos test v72\pepsi.webm"),
+        Ancho:=80, Alto:=80,
+        PosX:=1044, PosY:=10,
+        NivelCapa:=10, Opacidad:=100, Retraso:=0, FadeIn:=1000, FadeOut:=0)
 
-        '        '12:43
-        '        webForm.AgregarObjetoDisplay(IdGrupo:="grupo1", Id:=Guid.NewGuid().ToString(), Texto:=New TextoConfig With {
-        '        .Contenido = "12:43",
-        '        .Color = "white",
-        '        .FontSize = 100,
-        '        .FontWeight = "bold",
-        '        .FontFamily = "Montserrat",
-        '        .Align = "center",
-        '        .Efecto = efectoSeleccionado
-        '                                     },
-        '    Ancho:=0, Alto:=0,
-        '    PosX:=624,
-        '    PosY:=100,
-        '    NivelCapa:=12,
-        '    Opacidad:=100,
-        '    Retraso:=0, FadeIn:=400, FadeOut:=0)
+        'animar
+        webForm.AgregarObjetoDisplay(IdGrupo:="grupo1", Id:=Guid.NewGuid().ToString(), Url:=GetFileUrl("C:\Users\Angelo\Downloads\archivos test v72\animo.webm"),
+        Ancho:=1248, Alto:=300,
+        PosX:=0, PosY:=330,
+        NivelCapa:=10, Opacidad:=100, Retraso:=0, FadeIn:=1000, FadeOut:=0)
 
 
         ' Obtener valores de los NUD del Designer
@@ -241,7 +191,11 @@ Public Class Form2
         )
     End Sub
 
-
+    Private Function GetFileUrl(filePath As String) As String
+        ' Convierte una ruta de archivo local a una URL con el protocolo file://
+        ' Esto maneja correctamente las barras y los caracteres especiales.
+        Return New Uri(filePath).AbsoluteUri
+    End Function
 
     Private Sub ComboBox1_SelectedIndexChanged(sender As Object, e As EventArgs) Handles ComboBox1.SelectedIndexChanged
 
