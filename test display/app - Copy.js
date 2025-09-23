@@ -27,6 +27,7 @@ function agregarObjetoDisplay(config) {
     container.style.height = "100vh";
     container.style.overflow = "hidden";
 
+
     let elemento;
     let video = false;
     if (Url) {
@@ -72,6 +73,7 @@ function agregarObjetoDisplay(config) {
         }
 
 
+
     } else {
         console.warn("Ni Url ni Texto definidos para el objeto:", Id);
         return;
@@ -83,6 +85,9 @@ function agregarObjetoDisplay(config) {
     elemento.style.position = "absolute";
     elemento.style.left = PosX + "px";
     elemento.style.top = PosY + "px";
+
+
+
 
     // Width
     if (Ancho > 0 && !Texto) {
@@ -112,9 +117,12 @@ function agregarObjetoDisplay(config) {
             }
 
             if (Texto) {
+                elemento.dataset.originalHtml = Texto.Contenido || elemento.innerHTML;
+                elemento.dataset.currentEffect = Texto.Efecto || 0;
                 if (Texto.Efecto === 10) {
                     setTimeout(() => {
                         aplicarEfecto(elemento, Texto.Efecto || 0, Texto.Contenido);
+
                     }, FadeIn);
                 } else {
                     aplicarEfecto(elemento, Texto.Efecto || 0);
@@ -140,6 +148,8 @@ function agregarObjetoDisplay(config) {
 
     // Guardar en el mapa
     elementosMap.set(Id, { grupo: IdGrupo, nodo: elemento });
+    elemento.dataset.originalHtml = Texto.Contenido || elemento.innerHTML;
+    elemento.dataset.currentEffect = Texto.Efecto || 0;
 }
 
 function clearAllElements() {
@@ -425,4 +435,75 @@ function loadWithRetry(elemento, url, maxRetries = 3, delay = 1000) {
     }
 
     tryLoad();
+}
+
+function editarTexto(id, opciones) {
+    const obj = elementosMap.get(id);
+    if (!obj || !obj.nodo) {
+        console.warn("No existe el objeto con id:", id);
+        return;
+    }
+    const elemento = obj.nodo;
+    if (!(elemento instanceof HTMLElement) || elemento.tagName !== "DIV") {
+        console.warn("El objeto no parece ser un elemento de texto (DIV):", id);
+        return;
+    }
+
+    // destructurar opciones con defaults seguros
+    const {
+        Contenido,
+        Color,
+        FontSize,
+        FontWeight,
+        FontFamily,
+        Align,
+        Efecto,
+        ForzarReaplicar = false,
+        ResetEffect = false
+    } = opciones || {};
+
+    // ------------- estilos / alineado (no tocan estructura de efecto) -------------
+    if (Color !== undefined) elemento.style.color = Color;
+    if (FontSize !== undefined) elemento.style.fontSize = FontSize + "px";
+    if (FontWeight !== undefined) elemento.style.fontWeight = FontWeight;
+    if (FontFamily !== undefined) elemento.style.fontFamily = FontFamily;
+    if (Align === "center") {
+        elemento.style.left = elemento.style.left || elemento.dataset.posX + "px";
+        elemento.style.transform = "translateX(-50%)";
+    } else if (Align === "right") {
+        elemento.style.left = elemento.style.left || elemento.dataset.posX + "px";
+        elemento.style.transform = "translateX(-100%)";
+    } else if (Align !== undefined) {
+        elemento.style.transform = "";
+    }
+    // ---------------------------------------------------------------------------
+
+    // helpers para remover clases de efectos conocidos
+    const efectoClases = ["smokemonster", "fantasma", "slashed", "warningEffect"];
+    function removeEffectClasses(el) {
+        efectoClases.forEach(c => el.classList.remove(c));
+    }
+
+
+    // Si cambian el contenido:
+    if (Contenido !== undefined) {
+        // actualizar snapshot
+        elemento.dataset.originalHtml = Contenido;
+
+        const curEf = parseInt(elemento.dataset.currentEffect || "0", 10) || 0;
+
+        if (Efecto === undefined) {
+            // sin efecto -> simple replace
+            elemento.innerHTML = Contenido;
+            elemento.dataset.currentEffect = 0;
+        } else {
+            // hay un efecto -> siempre restaurar y reaplicar
+            removeEffectClasses(elemento);
+            elemento.innerHTML = Contenido;
+            elemento.dataset.currentEffect = Efecto;
+            aplicarEfecto(elemento, Efecto, Contenido);
+        }
+
+    }
+
 }

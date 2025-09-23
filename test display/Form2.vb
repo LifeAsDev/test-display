@@ -32,6 +32,8 @@ Public Class Form2
     End Sub
 
     Private Sub BtnAgregar_Click(sender As Object, e As EventArgs)
+
+
         ' Abrir OpenFileDialog
         Dim ofd As New OpenFileDialog With {
             .Filter = "Archivos multimedia|*.png;*.jpg;*.gif;*.mp4;*.avi;*.webm|Todos los archivos|*.*"
@@ -108,48 +110,48 @@ Public Class Form2
         Dim efectoSeleccionado As Integer = ComboBox1.SelectedIndex
 
 
-        'fondo
-        webForm.AgregarObjetoDisplay(IdGrupo:="grupo0", Id:=Guid.NewGuid().ToString(), Url:=GetFileUrl("C:\Users\Angelo\Downloads\archivos test v72\fondo.png"),
-        Ancho:=1248, Alto:=624,
-        PosX:=0, PosY:=0,
-        NivelCapa:=1, Opacidad:=100, Retraso:=0, FadeIn:=0, FadeOut:=0, ObjectFit:="fill")
+        ''fondo
+        'webForm.AgregarObjetoDisplay(IdGrupo:="grupo0", Id:=Guid.NewGuid().ToString(), Url:=GetFileUrl("C:\Users\Angelo\Downloads\archivos test v72\fondo.png"),
+        'Ancho:=1248, Alto:=624,
+        'PosX:=0, PosY:=0,
+        'NivelCapa:=1, Opacidad:=100, Retraso:=0, FadeIn:=0, FadeOut:=0, ObjectFit:="fill")
 
-        'mask
-        webForm.AgregarObjetoDisplay(IdGrupo:="grupo1", Id:=Guid.NewGuid().ToString(), Url:=GetFileUrl("C:\Users\Angelo\Downloads\archivos test v72\mask.png"),
-        Ancho:=1248, Alto:=624,
-        PosX:=0, PosY:=0,
-        NivelCapa:=2, Opacidad:=100, Retraso:=0, FadeIn:=0, FadeOut:=0)
+        ''mask
+        'webForm.AgregarObjetoDisplay(IdGrupo:="grupo1", Id:=Guid.NewGuid().ToString(), Url:=GetFileUrl("C:\Users\Angelo\Downloads\archivos test v72\mask.png"),
+        'Ancho:=1248, Alto:=624,
+        'PosX:=0, PosY:=0,
+        'NivelCapa:=2, Opacidad:=100, Retraso:=0, FadeIn:=0, FadeOut:=0)
 
-        'prc
-        webForm.AgregarObjetoDisplay(IdGrupo:="grupo1", Id:=Guid.NewGuid().ToString(), Url:=GetFileUrl("C:\Users\Angelo\Downloads\archivos test v72\precioled.webm"),
-        Ancho:=450, Alto:=450,
-        PosX:=-90, PosY:=100,
-        NivelCapa:=5, Opacidad:=100, Retraso:=0, FadeIn:=1000, FadeOut:=0)
+        ''prc
+        'webForm.AgregarObjetoDisplay(IdGrupo:="grupo1", Id:=Guid.NewGuid().ToString(), Url:=GetFileUrl("C:\Users\Angelo\Downloads\archivos test v72\precioled.webm"),
+        'Ancho:=450, Alto:=450,
+        'PosX:=-90, PosY:=100,
+        'NivelCapa:=5, Opacidad:=100, Retraso:=0, FadeIn:=1000, FadeOut:=0)
 
-        'uda
-        webForm.AgregarObjetoDisplay(IdGrupo:="grupo1", Id:=Guid.NewGuid().ToString(), Url:=GetFileUrl("C:\Users\Angelo\Downloads\archivos test v72\uda.webm"),
-        Ancho:=450, Alto:=450,
-        PosX:=870, PosY:=100,
-        NivelCapa:=5, Opacidad:=100, Retraso:=0, FadeIn:=1000, FadeOut:=0)
+        ''uda
+        'webForm.AgregarObjetoDisplay(IdGrupo:="grupo1", Id:=Guid.NewGuid().ToString(), Url:=GetFileUrl("C:\Users\Angelo\Downloads\archivos test v72\uda.webm"),
+        'Ancho:=450, Alto:=450,
+        'PosX:=870, PosY:=100,
+        'NivelCapa:=5, Opacidad:=100, Retraso:=0, FadeIn:=1000, FadeOut:=0)
 
 
-        'pepsi1
-        webForm.AgregarObjetoDisplay(IdGrupo:="grupo1", Id:=Guid.NewGuid().ToString(), Url:=GetFileUrl("C:\Users\Angelo\Downloads\archivos test v72\pepsi.webm"),
-        Ancho:=80, Alto:=80,
-        PosX:=124, PosY:=10,
-        NivelCapa:=10, Opacidad:=100, Retraso:=0, FadeIn:=1000, FadeOut:=0)
+        ''pepsi1
+        'webForm.AgregarObjetoDisplay(IdGrupo:="grupo1", Id:=Guid.NewGuid().ToString(), Url:=GetFileUrl("C:\Users\Angelo\Downloads\archivos test v72\pepsi.webm"),
+        'Ancho:=80, Alto:=80,
+        'PosX:=124, PosY:=10,
+        'NivelCapa:=10, Opacidad:=100, Retraso:=0, FadeIn:=1000, FadeOut:=0)
 
-        'pepsi2
-        webForm.AgregarObjetoDisplay(IdGrupo:="grupo1", Id:=Guid.NewGuid().ToString(), Url:=GetFileUrl("C:\Users\Angelo\Downloads\archivos test v72\pepsi.webm"),
-        Ancho:=80, Alto:=80,
-        PosX:=1044, PosY:=10,
-        NivelCapa:=10, Opacidad:=100, Retraso:=0, FadeIn:=1000, FadeOut:=0)
+        ''pepsi2
+        'webForm.AgregarObjetoDisplay(IdGrupo:="grupo1", Id:=Guid.NewGuid().ToString(), Url:=GetFileUrl("C:\Users\Angelo\Downloads\archivos test v72\pepsi.webm"),
+        'Ancho:=80, Alto:=80,
+        'PosX:=1044, PosY:=10,
+        'NivelCapa:=10, Opacidad:=100, Retraso:=0, FadeIn:=1000, FadeOut:=0)
 
-        'animar
-        webForm.AgregarObjetoDisplay(IdGrupo:="grupo1", Id:=Guid.NewGuid().ToString(), Url:=GetFileUrl("C:\Users\Angelo\Downloads\archivos test v72\animo.webm"),
-        Ancho:=1248, Alto:=300,
-        PosX:=0, PosY:=330,
-        NivelCapa:=10, Opacidad:=100, Retraso:=0, FadeIn:=1000, FadeOut:=0)
+        ''animar
+        'webForm.AgregarObjetoDisplay(IdGrupo:="grupo1", Id:=Guid.NewGuid().ToString(), Url:=GetFileUrl("C:\Users\Angelo\Downloads\archivos test v72\animo.webm"),
+        'Ancho:=1248, Alto:=300,
+        'PosX:=0, PosY:=330,
+        'NivelCapa:=10, Opacidad:=100, Retraso:=0, FadeIn:=1000, FadeOut:=0)
 
 
         ' Obtener valores de los NUD del Designer
@@ -164,11 +166,12 @@ Public Class Form2
         '    Return
         'End If
         Dim objectFitSeleccionado As String = ComboBox2.SelectedItem.ToString()
+        ultimoId = Guid.NewGuid().ToString()
 
         ' Enviar al WebView como objeto de texto
         webForm.AgregarObjetoDisplay(
             IdGrupo:="grupo1",
-            Id:=Guid.NewGuid().ToString(),
+            Id:=ultimoId,
             Texto:=New TextoConfig With {
                 .Contenido = "<span style='background-color:yellow;'>123456</span>",
                 .Color = "black",
@@ -207,6 +210,8 @@ Public Class Form2
     Private Sub BtnSetVideoBucle_Click(sender As Object, e As EventArgs)
         If ultimoId <> "" Then
             webForm.DLL_SetVideoBucle(ultimoId, False) ' True = con loop
+            webForm.DLL_EditarTexto(ultimoId, "<b>Nuevo</b>", efecto:=1)
+
         End If
     End Sub
 

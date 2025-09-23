@@ -155,6 +155,26 @@ Public Class Form_webview
         Await web.CoreWebView2.ExecuteScriptAsync($"eliminaObjeto('{id}');")
     End Sub
 
+    Public Async Sub DLL_EditarTexto(id As String, contenido As String, Optional color As String = Nothing, Optional fontSize As Integer = 0, Optional fontWeight As String = Nothing, Optional fontFamily As String = Nothing, Optional align As String = Nothing, Optional efecto As Integer = -1)
+        Dim opciones = New System.Collections.Generic.Dictionary(Of String, Object)()
+
+        If contenido IsNot Nothing Then opciones("Contenido") = contenido
+        If Not String.IsNullOrEmpty(color) Then opciones("Color") = color
+        If fontSize > 0 Then opciones("FontSize") = fontSize
+        If Not String.IsNullOrEmpty(fontWeight) Then opciones("FontWeight") = fontWeight
+        If Not String.IsNullOrEmpty(fontFamily) Then opciones("FontFamily") = fontFamily
+        If Not String.IsNullOrEmpty(align) Then opciones("Align") = align
+        If efecto >= 0 Then opciones("Efecto") = efecto
+
+
+        Dim opcionesJson = Newtonsoft.Json.JsonConvert.SerializeObject(opciones, New Newtonsoft.Json.JsonSerializerSettings With {.NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore})
+        ' id correctamente escapado como string JSON:
+        Dim js = $"editarTexto({Newtonsoft.Json.JsonConvert.ToString(id)}, {opcionesJson});"
+        Await web.CoreWebView2.ExecuteScriptAsync(js)
+    End Sub
+
+
+
     Public Async Sub ClearAllElements()
 
 
