@@ -1,4 +1,4 @@
-// Mapa global para manejar los grupos y objetos
+ï»¿// Mapa global para manejar los grupos y objetos
 const elementosMap = new Map();
 
 function agregarObjetoDisplay(config) {
@@ -31,7 +31,7 @@ function agregarObjetoDisplay(config) {
     let elemento;
     let video = false;
     if (Url) {
-        // Crear el elemento según tipo de archivo
+        // Crear el elemento segÃºn tipo de archivo
         const ext = Url.split(".").pop().toLowerCase();
         const uniqueUrl = Url + (Url.includes("?") ? "&" : "?") + "v=" + Date.now();
 
@@ -61,7 +61,7 @@ function agregarObjetoDisplay(config) {
         elemento.style.fontSize = (Texto.FontSize || 24) + "px";
         elemento.style.fontWeight = Texto.FontWeight || "normal";
         elemento.style.fontFamily = Texto.FontFamily || "sans-serif";
-        elemento.style.whiteSpace = "pre-wrap"; // para soportar saltos de línea
+        elemento.style.whiteSpace = "pre-wrap"; // para soportar saltos de lÃ­nea
         if (Texto.Align === "center") {
             elemento.style.left = PosX + "px";
             elemento.style.transform = "translateX(-50%)";
@@ -109,7 +109,8 @@ function agregarObjetoDisplay(config) {
 
 
     function mostrarElemento() {
-        setTimeout(() => {
+ 
+        elemento._timerMostrar = setTimeout(() => {
             elemento.style.opacity = (Opacidad / 100).toString();
 
             if (video) {
@@ -119,6 +120,7 @@ function agregarObjetoDisplay(config) {
             if (Texto) {
                 elemento.dataset.originalHtml = Texto.Contenido || elemento.innerHTML;
                 elemento.dataset.currentEffect = Texto.Efecto || 0;
+              
                 if (Texto.Efecto === 10) {
                     setTimeout(() => {
                         aplicarEfecto(elemento, Texto.Efecto || 0, Texto.Contenido);
@@ -167,57 +169,59 @@ function aplicarEfecto(elemento, efecto,innerHtml) {
     let inner;
 
     switch (efecto) {
-        case 1: { // Máquina de escribir que respeta HTML
-            const velocidad = 100; // ms por carácter (ajusta)
+        case 1: { // MÃ¡quina de escribir que respeta HTML
+            const velocidad = 100;
             const html = elemento.innerHTML;
-            elemento.innerHTML = ""; // limpiamos el contenedor visual
+            elemento.innerHTML = "";
+            
+            // --- cancelamos ejecuciones anteriores ---
+            if (elemento._typingTimer) {
+                console.log(elemento._typingTimer);
+                console.log(html);
+                clearTimeout(elemento._typingTimer);
+                elemento._typingTimer = null;
+            }
+            const runId = Symbol("typing");
+            elemento._typingRunId = runId;
 
-            // parseamos el HTML original
             const temp = document.createElement("div");
             temp.innerHTML = html;
-
             const steps = [];
 
-            // recorre el DOM original y crea la estructura (sin texto),
-            // acumulando pasos para insertar los caracteres en los parents adecuados
             function traverse(node, parentTarget) {
                 if (node.nodeType === Node.ELEMENT_NODE) {
-                    // crear elemento sin hijos, copiar atributos
                     const el = document.createElement(node.tagName);
                     for (let i = 0; i < node.attributes.length; i++) {
                         const att = node.attributes[i];
                         el.setAttribute(att.name, att.value);
                     }
                     parentTarget.appendChild(el);
-
-                    // recorrer hijos con este nuevo elemento como parent
                     Array.from(node.childNodes).forEach((child) => traverse(child, el));
                 } else if (node.nodeType === Node.TEXT_NODE) {
                     const text = node.nodeValue || "";
-                    // cada carácter es un paso que añade un TextNode al parentTarget
                     for (const ch of text) {
-                        const char = ch; // captura por valor
                         steps.push(() => {
-                            parentTarget.appendChild(document.createTextNode(char));
+                            parentTarget.appendChild(document.createTextNode(ch));
                         });
                     }
                 }
-                // comentarios u otros nodos los ignoramos
             }
-
-            // construir estructura vacía y steps
             Array.from(temp.childNodes).forEach((child) => traverse(child, elemento));
 
-            // ejecutar los pasos secuencialmente
             let idx = 0;
             function runStep() {
+                // si ya hubo otra ediciÃ³n, cancelamos
+                if (elemento._typingRunId !== runId) return;
+
                 if (idx >= steps.length) return;
                 steps[idx]();
                 idx++;
-                // opcional: acelerar espacios
-                const lastChar = (steps[idx - 1] && steps[idx - 1].toString()) || "";
-                const nextDelay = (lastChar === " " ? Math.max(20, velocidad / 3) : velocidad);
-                setTimeout(runStep, nextDelay);
+
+                // âš ï¸ aquÃ­ corrige tu lÃ³gica de espacios
+                const char = html[idx - 1];
+                const nextDelay = (char === " " ? Math.max(20, velocidad / 3) : velocidad);
+
+                elemento._typingTimer = setTimeout(runStep, nextDelay);
             }
             runStep();
             break;
@@ -325,7 +329,7 @@ function aplicarEfecto(elemento, efecto,innerHtml) {
                     text.split("").forEach((letra, i) => {
                         const span = document.createElement("span");
                         span.textContent = letra;
-                        span.style.setProperty("--i", i); // índice dinámico
+                        span.style.setProperty("--i", i); // Ã­ndice dinÃ¡mico
                         parentTarget.appendChild(span);
                     });
                 }
@@ -342,6 +346,63 @@ function aplicarEfecto(elemento, efecto,innerHtml) {
             elemento.setAttribute("data-text", elemento.textContent);
             break;
 
+        case 12: { // ticker vertical paso a paso
+            elemento.style.overflow = "hidden";
+            elemento.style.position = "relative";
+
+            // limpiar contenido
+            const text = (innerHtml || elemento.innerHTML).replace(/\\n/g, "\n");
+            elemento.innerHTML = "";
+            console.log(text);
+
+            // dividir en items (por lÃ­neas)
+            const items = text.split(/\r?\n/).filter(t => t.trim() !== "");
+
+            console.log(items);
+
+            // contenedor interno
+            const inner = document.createElement("div");
+            inner.style.position = "absolute";
+            inner.style.top = "0";
+            inner.style.left = "0";
+            inner.style.transition = "transform 0.5s ease";
+            elemento.appendChild(inner);
+
+            // agregar items
+            items.forEach(txt => {
+                const div = document.createElement("div");
+                div.innerHTML = txt; // respeta HTML dentro del item
+                inner.appendChild(div);
+            });
+
+            // medir altura del primer item
+            const itemHeight = inner.firstElementChild.offsetHeight;
+            elemento.style.height = itemHeight + "px";
+
+            let index = 0;
+            setInterval(() => {
+                index = (index + 1) % items.length;
+                inner.style.transform = `translateY(-${index * itemHeight}px)`;
+            }, 1500); // 0.5s animaciÃ³n + 1s pausa
+            break;
+        }
+        case 13: { // Bounce secuencial por letra
+            const text = innerHtml || elemento.innerHTML;
+            elemento.innerHTML = ""; // limpiar
+
+            // dividir en letras
+            [...text].forEach((ch, i) => {
+                const span = document.createElement("span");
+                span.textContent = ch;
+                span.style.display = "inline-block";
+                span.style.animation = `bounce 0.6s ease infinite`;
+                span.style.animationDelay = `-${i * 0.1}s`;
+                span.style.animationFillMode = "both"; // asegura que el estado inicial se aplique
+                elemento.appendChild(span);
+            });
+
+            break;
+        }
 
     }
 }
@@ -355,7 +416,7 @@ function transformarDivASlashed(element) {
     // Limpio el contenido
     element.textContent = "";
 
-    // Agrego clase "slashed" manteniendo las demás
+    // Agrego clase "slashed" manteniendo las demÃ¡s
     element.classList.add("slashed");
 
     // Crear hijos
@@ -412,7 +473,7 @@ function eliminaObjeto(id) {
     const obj = elementosMap.get(id);
     if (obj && obj.nodo) {
         obj.nodo.remove();
-        elementosMap.delete(id); // limpiar del mapa también
+        elementosMap.delete(id); // limpiar del mapa tambiÃ©n
     }
 }
 
@@ -429,7 +490,7 @@ function loadWithRetry(elemento, url, maxRetries = 3, delay = 1000) {
                 console.warn(`Fallo al cargar (${attempts}), reintentando...`);
                 setTimeout(tryLoad, delay);
             } else {
-                console.error(`No se pudo cargar después de ${maxRetries} intentos: ${url}`);
+                console.error(`No se pudo cargar despuÃ©s de ${maxRetries} intentos: ${url}`);
             }
         };
     }
@@ -483,6 +544,7 @@ function editarTexto(id, opciones) {
     function removeEffectClasses(el) {
         efectoClases.forEach(c => el.classList.remove(c));
     }
+    elemento.style.opacity = "100";
 
 
     // Si cambian el contenido:
@@ -492,11 +554,17 @@ function editarTexto(id, opciones) {
 
         const curEf = parseInt(elemento.dataset.currentEffect || "0", 10) || 0;
 
+        if (elemento._timerMostrar) {
+            clearTimeout(elemento._timerMostrar);
+            elemento._timerMostrar = null;
+        }
+
         if (Efecto === undefined) {
             // sin efecto -> simple replace
             elemento.innerHTML = Contenido;
             elemento.dataset.currentEffect = 0;
         } else {
+            console.log(Contenido);
             // hay un efecto -> siempre restaurar y reaplicar
             removeEffectClasses(elemento);
             elemento.innerHTML = Contenido;

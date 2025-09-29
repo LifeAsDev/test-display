@@ -47,8 +47,7 @@ Public Class Form_webview
 
     Private Async Sub Form_webview_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         ' Iniciar mini servidor
-        Me.Width = 1920
-        Me.Height = 1080
+
         Me.TransparencyKey = Color.Lime
         Me.BackColor = Color.Lime
         Me.TopMost = True

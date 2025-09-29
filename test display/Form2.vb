@@ -24,6 +24,8 @@ Public Class Form2
         webForm.StartPosition = FormStartPosition.Manual
         webForm.Left = 0
         webForm.Top = 0
+        webForm.Width = 1366
+        webForm.Height = 768
         webForm.ShowInTaskbar = True
         ComboBox1.SelectedIndex = 0
         ComboBox2.SelectedIndex = 0
@@ -168,30 +170,47 @@ Public Class Form2
         Dim objectFitSeleccionado As String = ComboBox2.SelectedItem.ToString()
         ultimoId = Guid.NewGuid().ToString()
 
-        ' Enviar al WebView como objeto de texto
-        webForm.AgregarObjetoDisplay(
-            IdGrupo:="grupo1",
-            Id:=ultimoId,
-            Texto:=New TextoConfig With {
-                .Contenido = "<span style='background-color:yellow;'>123456</span>",
-                .Color = "black",
-                .FontSize = 48,
-                .FontWeight = "bold",
-                .FontFamily = "Montserrat",
-                .Align = "left",
-                .Efecto = efectoSeleccionado
-            },
-            Ancho:=ancho,
-            Alto:=alto,
-            PosX:=posX,
-            PosY:=posY,
-            NivelCapa:=2,
-            Opacidad:=opacidad,
-            Retraso:=0,
-            FadeIn:=400,
-            FadeOut:=0,
-            ObjectFit:=objectFitSeleccionado
-        )
+        '' Enviar al WebView como objeto de texto
+        'webForm.AgregarObjetoDisplay(
+        '    IdGrupo:="grupo1",
+        '    Id:=ultimoId,
+        '    Texto:=New TextoConfig With {
+        '        .Contenido = "<span style='background-color:yellow;'>123456</span>",
+        '        .Color = "black",
+        '        .FontSize = 48,
+        '        .FontWeight = "bold",
+        '        .FontFamily = "Montserrat",
+        '        .Align = "left",
+        '        .Efecto = efectoSeleccionado
+        '    },
+        '    Ancho:=ancho,
+        '    Alto:=alto,
+        '    PosX:=posX,
+        '    PosY:=posY,
+        '    NivelCapa:=2,
+        '    Opacidad:=opacidad,
+        '    Retraso:=0,
+        '    FadeIn:=400,
+        '    FadeOut:=0,
+        '    ObjectFit:=objectFitSeleccionado
+        ')
+
+        webForm.AgregarObjetoDisplay(IdGrupo:="grupo1", Id:="reloj", Texto:=New TextoConfig With {
+    .Contenido = "12:43",
+    .Color = "#F54927",
+    .FontSize = 60,
+    .FontWeight = "bold",
+    .FontFamily = "Montserrat",
+    .Align = "center",
+    .Efecto = 1},
+Ancho:=0, Alto:=0,
+PosX:=960,
+PosY:=10,
+NivelCapa:=12,
+Opacidad:=100,
+Retraso:=0, FadeIn:=400, FadeOut:=0)
+        webForm.DLL_EditarTexto("reloj", "🍒 Cherry\n🍋 Lemon\n🔔 Bell\n💎 Diamond", efecto:=13)
+
     End Sub
 
     Private Function GetFileUrl(filePath As String) As String
@@ -239,4 +258,31 @@ Public Class Form2
         End If
     End Sub
 
+
+    Private Sub AplicarButton_Click(sender As Object, e As EventArgs) Handles AplicarButton.Click
+        ' Obtener valores de los NumericUpDown
+        Dim nuevoAncho As Integer = CInt(DisplayAncho.Value)
+        Dim nuevoAlto As Integer = CInt(DisplayAlto.Value)
+        Dim nuevaPosX As Integer = CInt(DisplayX.Value)
+        Dim nuevaPosY As Integer = CInt(DisplayY.Value)
+
+        ' Cambiar tamaño y posición del WebView
+        webForm.Width = nuevoAncho
+        webForm.Height = nuevoAlto
+        webForm.Left = nuevaPosX
+        webForm.Top = nuevaPosY
+    End Sub
+
+
+    Private Sub NUDPosX_ValueChanged(sender As Object, e As EventArgs) Handles NUDPosX.ValueChanged
+
+    End Sub
+
+    Private Sub Label1_Click(sender As Object, e As EventArgs) Handles Label1.Click
+
+    End Sub
+
+    Private Sub DisplayAncho_ValueChanged(sender As Object, e As EventArgs) Handles DisplayAncho.ValueChanged
+
+    End Sub
 End Class
