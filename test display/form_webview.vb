@@ -72,7 +72,8 @@ Public Class Form_webview
         web.DefaultBackgroundColor = Color.Transparent ' <-- clave
         'web.CoreWebView2.Navigate("http://localhost:5000/")
         Dim htmlPath As String = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "index.html")
-
+        web.CoreWebView2.AddWebResourceRequestedFilter("app://bitmap/*", Microsoft.Web.WebView2.Core.CoreWebView2WebResourceContext.All)
+        AddHandler web.CoreWebView2.WebResourceRequested, AddressOf OnWebResourceRequested
         ' Navegar directamente al archivo local
         web.CoreWebView2.Navigate("file:///" & htmlPath.Replace("\", "/"))
         'Xpcom.Initialize("C:\Users\Angelo\Desktop\project\test display\test display\Firefox\") ' <-- Cambia por tu ruta
@@ -89,6 +90,54 @@ Public Class Form_webview
         '    ' Navegar a una página de prueba
         '    browser.Navigate("localhost:5000")
     End Sub
+
+
+    ' Diccionario para almacenar Bitmaps en memoria
+    Private bitmapsMemoria As New Dictionary(Of String, Bitmap)()
+
+    ' Guardar un Bitmap en memoria con clave
+    Public Function GuardarBitmap(nombre As String, bmp As Bitmap) As String
+        ' Guardar en memoria
+        bitmapsMemoria(nombre) = bmp
+
+        ' Generar la URL para WebView
+        Dim url As String = "app://bitmap/" & nombre
+        Return url
+    End Function
+
+    ' Cuando WebView solicita app://bitmap/…
+    Private Sub OnWebResourceRequested(sender As Object, e As CoreWebView2WebResourceRequestedEventArgs)
+        Dim uri As String = e.Request.Uri
+        Debug.WriteLine("Solicitud bitmap: " & e.Request.Uri)
+
+        ' Extraer solo el path, ignorando query string
+        Dim nombre As String = uri.Substring("app://bitmap/".Length)
+        Dim qIndex As Integer = nombre.IndexOf("?")
+        If qIndex >= 0 Then
+            nombre = nombre.Substring(0, qIndex) ' quitar ?v=...
+        End If
+        Debug.WriteLine(nombre)
+        ' Mostrar todas las claves de bitmapsMemoria en Output de Visual Studio
+
+        LogBitmapsMemoria()
+
+        If bitmapsMemoria.ContainsKey(nombre) Then
+            Dim ms As New IO.MemoryStream()
+            bitmapsMemoria(nombre).Save(ms, Imaging.ImageFormat.Png)
+            ms.Position = 0
+            e.Response = web.CoreWebView2.Environment.CreateWebResourceResponse(ms, 200, "OK", "Content-Type: image/png")
+            ' No cerramos ms, WebView2 se encarga de leerlo
+        End If
+    End Sub
+    Private Sub LogBitmapsMemoria()
+        Debug.WriteLine("---- bitmapsMemoria ----")
+        For Each kvp As KeyValuePair(Of String, Bitmap) In bitmapsMemoria
+            Debug.WriteLine("Nombre: " & kvp.Key & " | Tamaño: " & kvp.Value.Width & "x" & kvp.Value.Height)
+        Next
+        Debug.WriteLine("------------------------")
+    End Sub
+
+
 
     Public Async Sub AgregarObjetoDisplay(
         IdGrupo As String,
