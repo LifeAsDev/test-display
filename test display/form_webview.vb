@@ -13,6 +13,8 @@ Imports Microsoft.Web.WebView2.Core
 Imports Microsoft.Web.WebView2.WinForms
 Imports Newtonsoft.Json
 Imports IOF = System.IO
+Imports Accord.Video.FFMPEG
+Imports System.Drawing
 
 Public Enum ObjectFitOption
     Fill
@@ -37,6 +39,43 @@ End Class
 Public Class Form_webview
     Private web As Microsoft.Web.WebView2.WinForms.WebView2
     Private server As New MiniServer()
+
+
+
+    Public Function GetFrame(videoPath As String, segundo As Double) As Bitmap
+        Dim tempPath As String = Path.Combine(Path.GetTempPath(), "ffmpeg_temp")
+        If Not Directory.Exists(tempPath) Then Directory.CreateDirectory(tempPath)
+
+        ' Ruta del FFmpeg extraído
+        Dim ffmpegPath As String = Path.Combine(tempPath, "ffmpeg.exe")
+
+        ' Extraer FFmpeg desde los recursos si no existe
+        If Not File.Exists(ffmpegPath) Then
+            File.WriteAllBytes(ffmpegPath, My.Resources.ffmpeg)
+        End If
+
+        ' Argumentos: -ss = segundo, -i = video, -frames:v 1 = un frame, -f image2pipe -vcodec png pipe:1
+        Dim args As String = $"-ss {segundo} -i ""{videoPath}"" -frames:v 1 -f image2pipe -vcodec png pipe:1"
+
+        Using p As New Process()
+            p.StartInfo.FileName = ffmpegPath
+            p.StartInfo.Arguments = args
+            p.StartInfo.UseShellExecute = False
+            p.StartInfo.RedirectStandardOutput = True
+            p.StartInfo.CreateNoWindow = True
+            p.Start()
+
+            Using ms As New MemoryStream()
+                p.StandardOutput.BaseStream.CopyTo(ms)
+                p.WaitForExit()
+                ms.Position = 0
+
+                ' Devuelve el Bitmap extraído
+                Return New Bitmap(ms)
+            End Using
+        End Using
+    End Function
+
 
     Public Function AddDynamicFile(originalFile As String) As String
         Dim ext = IO.Path.GetExtension(originalFile).ToLowerInvariant()
@@ -119,7 +158,6 @@ Public Class Form_webview
         Debug.WriteLine(nombre)
         ' Mostrar todas las claves de bitmapsMemoria en Output de Visual Studio
 
-        LogBitmapsMemoria()
 
         If bitmapsMemoria.ContainsKey(nombre) Then
             Dim ms As New IO.MemoryStream()

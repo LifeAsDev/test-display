@@ -157,6 +157,8 @@ Public Class Form2
         'NivelCapa:=10, Opacidad:=100, Retraso:=0, FadeIn:=1000, FadeOut:=0)
 
 
+
+
         ' Obtener valores de los NUD del Designer
         Dim posX = CInt(NUDPosX.Value)
         Dim posY = CInt(NUDPosY.Value)
@@ -196,23 +198,30 @@ Public Class Form2
         '    ObjectFit:=objectFitSeleccionado
         ')
 
+        Dim bmp = webForm.GetFrame("C:\Users\Angelo\Downloads\archivos test v72\animo.webm", 1)
+
+
         ' Crear un bitmap de 200x100 píxeles
-        Dim bmp As New Bitmap(200, 100)
+        'Dim bmp As New Bitmap(200, 100)
 
-        ' Pintar algo sobre él
-        Using g As Graphics = Graphics.FromImage(bmp)
-            g.Clear(Color.LightBlue)  ' fondo
-            g.DrawEllipse(Pens.Red, 10, 10, 50, 50)
-            g.DrawString("Hola!", New Font("Arial", 16), Brushes.Black, New PointF(60, 30))
-        End Using
-
-
-        Dim url As String = webForm.GuardarBitmap("miImagen1.png", bmp)
-
-        webForm.AgregarObjetoDisplay(IdGrupo:="grupo1", Id:=Guid.NewGuid().ToString(), Url:=url,
+        '' Pintar algo sobre él
+        'Using g As Graphics = Graphics.FromImage(bmp)
+        '    g.Clear(Color.LightBlue)  ' fondo
+        '    g.DrawEllipse(Pens.Red, 10, 10, 50, 50)
+        '    g.DrawString("Hola!", New Font("Arial", 16), Brushes.Black, New PointF(60, 30))
+        'End Using
+        Dim url As String
+        If bmp IsNot Nothing Then
+            url = webForm.GuardarBitmap("miImagen1.png", bmp)
+            webForm.AgregarObjetoDisplay(IdGrupo:="grupo1", Id:=Guid.NewGuid().ToString(), Url:=url,
         Ancho:=1248, Alto:=300,
         PosX:=0, PosY:=330,
         NivelCapa:=10, Opacidad:=100, Retraso:=0, FadeIn:=1000, FadeOut:=0)
+
+
+        Else
+            MessageBox.Show("No se pudo obtener el frame. El formato o el número de frame puede ser incorrecto.")
+        End If
 
 
 
