@@ -15,6 +15,7 @@ Imports Newtonsoft.Json
 Imports IOF = System.IO
 Imports Accord.Video.FFMPEG
 Imports System.Drawing
+Imports LibVLCSharp.Shared
 
 Public Enum ObjectFitOption
     Fill
@@ -42,40 +43,51 @@ Public Class Form_webview
 
 
 
+
     Public Function GetFrame(videoPath As String, segundo As Double) As Bitmap
-        Dim tempPath As String = Path.Combine(Path.GetTempPath(), "ffmpeg_temp")
-        If Not Directory.Exists(tempPath) Then Directory.CreateDirectory(tempPath)
+        ' Inicializar LibVLC
+        Core.Initialize()
 
-        ' Ruta del FFmpeg extraído
-        Dim ffmpegPath As String = Path.Combine(tempPath, "ffmpeg.exe")
+        ' Ruta a los binarios nativos VLC
+        Dim vlcPath As String = Path.Combine(Application.StartupPath, "libvlc", "win-x64") ' o win-x86
 
-        ' Extraer FFmpeg desde los recursos si no existe
-        If Not File.Exists(ffmpegPath) Then
-            File.WriteAllBytes(ffmpegPath, My.Resources.ffmpeg)
-        End If
+        Using libVlc As New LibVLC("--no-video-title-show", "--quiet", "--intf", "dummy", "--no-xlib", "--no-video")
+            Using media As New Media(libVlc, videoPath, FromType.FromPath)
+                Using player As New MediaPlayer(media)
+                    player.Play()
+                    Thread.Sleep(200) ' esperar a que arranque
+                    player.Time = CLng(segundo * 1000) ' mover al segundo deseado
+                    Thread.Sleep(200) ' esperar a que decodifique
 
-        ' Argumentos: -ss = segundo, -i = video, -frames:v 1 = un frame, -f image2pipe -vcodec png pipe:1
-        Dim args As String = $"-ss {segundo} -i ""{videoPath}"" -frames:v 1 -f image2pipe -vcodec png pipe:1"
+                    ' Snapshot temporal
+                    Dim tmpFile As String = Path.Combine(Path.GetTempPath(), "frame.png")
+                    player.TakeSnapshot(0, tmpFile, 0, 0) ' 0,0 = tamaño original
+                    player.Stop()
 
-        Using p As New Process()
-            p.StartInfo.FileName = ffmpegPath
-            p.StartInfo.Arguments = args
-            p.StartInfo.UseShellExecute = False
-            p.StartInfo.RedirectStandardOutput = True
-            p.StartInfo.CreateNoWindow = True
-            p.Start()
+                    Dim bmp As Bitmap = Nothing
+                    Dim maxRetries As Integer = 10
+                    Dim delay As Integer = 100 ' milisegundos
 
-            Using ms As New MemoryStream()
-                p.StandardOutput.BaseStream.CopyTo(ms)
-                p.WaitForExit()
-                ms.Position = 0
+                    For i As Integer = 1 To maxRetries
+                        Try
+                            Using fs As New FileStream(tmpFile, FileMode.Open, FileAccess.Read, FileShare.Read)
+                                bmp = New Bitmap(fs)
+                            End Using
 
-                ' Devuelve el Bitmap extraído
-                Return New Bitmap(ms)
+                            ' Si llegamos aquí, el archivo ya se pudo leer
+                            File.Delete(tmpFile)
+                            Exit For
+                        Catch ex As IOException
+                            Threading.Thread.Sleep(delay) ' esperar un poco y reintentar
+                        End Try
+                    Next
+
+                    Return bmp
+
+                End Using
             End Using
         End Using
     End Function
-
 
     Public Function AddDynamicFile(originalFile As String) As String
         Dim ext = IO.Path.GetExtension(originalFile).ToLowerInvariant()
