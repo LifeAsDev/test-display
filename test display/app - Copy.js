@@ -31,24 +31,43 @@ function agregarObjetoDisplay(config) {
     let elemento;
     let video = false;
     if (Url) {
-        // Crear el elemento según tipo de archivo
-        const ext = Url.split(".").pop().toLowerCase();
-        const uniqueUrl = Url + (Url.includes("?") ? "&" : "?") + "v=" + Date.now();
 
-        if (["png", "jpg", "jpeg", "gif", "webp"].includes(ext)) {
-            elemento = document.createElement("img");
-            loadWithRetry(elemento, uniqueUrl, 5, 700);
-        } else if (["mp4", "webm", "ogg", "avi"].includes(ext)) {
+        if (Url === "camera") {
+            // 🔴 Webcam
             video = true;
             elemento = document.createElement("video");
+            elemento.autoplay = true;
+            elemento.muted = true; // evita feedback de audio
+            elemento.playsInline = true;
 
-            loadWithRetry(elemento, uniqueUrl, 5, 100);
-            elemento.autoplay = false;
-            elemento.muted = false;
-            elemento.loop = true;
+            navigator.mediaDevices.getUserMedia({ video: true, audio: false })
+                .then(stream => {
+                    elemento.srcObject = stream;
+                })
+                .catch(err => {
+                    console.error("Error al acceder a la cámara:", err);
+                });
         } else {
-            console.warn("Formato no soportado:", Url);
-            return;
+
+            // Crear el elemento según tipo de archivo
+            const ext = Url.split(".").pop().toLowerCase();
+            const uniqueUrl = Url + (Url.includes("?") ? "&" : "?") + "v=" + Date.now();
+
+            if (["png", "jpg", "jpeg", "gif", "webp"].includes(ext)) {
+                elemento = document.createElement("img");
+                loadWithRetry(elemento, uniqueUrl, 5, 700);
+            } else if (["mp4", "webm", "ogg", "avi"].includes(ext)) {
+                video = true;
+                elemento = document.createElement("video");
+
+                loadWithRetry(elemento, uniqueUrl, 5, 100);
+                elemento.autoplay = false;
+                elemento.muted = false;
+                elemento.loop = true;
+            } else {
+                console.warn("Formato no soportado:", Url);
+                return;
+            }
         }
     } else if (Texto) {        const uniqueUrl = Url + (Url.includes("?") ? "&" : "?") + "v=" + Date.now();
 

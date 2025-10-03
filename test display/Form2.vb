@@ -198,18 +198,9 @@ Public Class Form2
         '    ObjectFit:=objectFitSeleccionado
         ')
 
-        Dim bmp = webForm.GetFrame("C:\Users\Angelo\Downloads\archivos test v72\animo.webm", 1)
+        Dim bmp = webForm.GetFrameWebM("C:\Users\Angelo\Downloads\archivos test v72\animo.webm", 1)
 
 
-        ' Crear un bitmap de 200x100 píxeles
-        'Dim bmp As New Bitmap(200, 100)
-
-        '' Pintar algo sobre él
-        'Using g As Graphics = Graphics.FromImage(bmp)
-        '    g.Clear(Color.LightBlue)  ' fondo
-        '    g.DrawEllipse(Pens.Red, 10, 10, 50, 50)
-        '    g.DrawString("Hola!", New Font("Arial", 16), Brushes.Black, New PointF(60, 30))
-        'End Using
         Dim url As String
         If bmp IsNot Nothing Then
             url = webForm.GuardarBitmap("miImagen1.png", bmp)
@@ -222,6 +213,8 @@ Public Class Form2
         Else
             MessageBox.Show("No se pudo obtener el frame. El formato o el número de frame puede ser incorrecto.")
         End If
+
+
 
 
 

@@ -59,5 +59,59 @@ Namespace My.Resources
                 resourceCulture = value
             End Set
         End Property
+        
+        '''<summary>
+        '''  Looks up a localized string similar to Imports System.IO.
+        '''</summary>
+        Friend ReadOnly Property _String() As String
+            Get
+                Return ResourceManager.GetString("String", resourceCulture)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized string similar to Imports System.Diagnostics.
+        '''</summary>
+        Friend ReadOnly Property String1() As String
+            Get
+                Return ResourceManager.GetString("String1", resourceCulture)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized string similar to Imports Vlc.DotNet.Core.
+        '''</summary>
+        Friend ReadOnly Property String2() As String
+            Get
+                Return ResourceManager.GetString("String2", resourceCulture)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized string similar to Imports Vlc.DotNet.Forms &apos; Es clave para VlcControl.
+        '''</summary>
+        Friend ReadOnly Property String3() As String
+            Get
+                Return ResourceManager.GetString("String3", resourceCulture)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized string similar to Imports System.Drawing.
+        '''</summary>
+        Friend ReadOnly Property String4() As String
+            Get
+                Return ResourceManager.GetString("String4", resourceCulture)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized string similar to Imports System.Threading.
+        '''</summary>
+        Friend ReadOnly Property String5() As String
+            Get
+                Return ResourceManager.GetString("String5", resourceCulture)
+            End Get
+        End Property
     End Module
 End Namespace

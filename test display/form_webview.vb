@@ -1,21 +1,14 @@
 ﻿Imports System.Collections.Concurrent
-Imports System.Diagnostics
 Imports System.IO
-Imports System.Net.Mime
-Imports System.Text
-Imports System.Threading
 Imports EmbedIO
 Imports EmbedIO.Actions
-Imports EmbedIO.Files
-Imports EmbedIO.Utilities
-Imports EmbedIO.WebApi
+Imports Emgu.CV
+Imports Emgu.CV.CvEnum
 Imports Microsoft.Web.WebView2.Core
-Imports Microsoft.Web.WebView2.WinForms
 Imports Newtonsoft.Json
-Imports IOF = System.IO
-Imports Accord.Video.FFMPEG
-Imports System.Drawing
 Imports LibVLCSharp.Shared
+Imports System.Threading
+
 
 Public Enum ObjectFitOption
     Fill
@@ -42,52 +35,155 @@ Public Class Form_webview
     Private server As New MiniServer()
 
 
+    Public Function GetFrameWebM(videoPath As String, segundo As Double) As Bitmap
+        ' Ruta al ffmpeg.exe dentro del proyecto
+        Dim ffmpegPath As String = Path.Combine(Application.StartupPath, "ffmpeg", "ffmpeg.exe")
+        If Not File.Exists(ffmpegPath) Then
+            Throw New FileNotFoundException("No se encontró ffmpeg.exe", ffmpegPath)
+        End If
+        ' Archivo temporal para el frame
+        Dim tmpFile As String = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString() & ".png")
+
+        ' Argumentos: -ss = segundo, -i = video, -frames:v 1 = solo 1 frame, -y = sobrescribir
+        Dim args As String = $"-ss {segundo} -i ""{videoPath}"" -frames:v 1 ""{tmpFile}"" -y -loglevel quiet"
+
+        ' Configurar proceso FFmpeg
+        Dim startInfo As New ProcessStartInfo With {
+        .FileName = ffmpegPath,
+        .Arguments = args,
+        .CreateNoWindow = True,
+        .UseShellExecute = False,
+        .RedirectStandardOutput = False,
+        .RedirectStandardError = False
+    }
+
+        Using proc As Process = Process.Start(startInfo)
+            proc.WaitForExit()
+        End Using
+
+        ' Cargar el frame en Bitmap
+        Dim bmp As Bitmap
+        Using fs As New FileStream(tmpFile, FileMode.Open, FileAccess.Read, FileShare.Read)
+            bmp = New Bitmap(fs)
+        End Using
+
+        ' Borrar archivo temporal
+        File.Delete(tmpFile)
+
+        Return bmp
+    End Function
+
+    Public Function GetFrameLight(videoPath As String, segundo As Double) As Bitmap
+        Dim tmpFile As String = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString() & ".png")
+
+        ' Llama a ffmpeg.exe directamente
+        Dim startInfo As New ProcessStartInfo()
+        startInfo.FileName = Path.Combine(Application.StartupPath, "ffmpeg.exe") ' solo 30 MB
+        startInfo.Arguments = $"-ss {segundo} -i ""{videoPath}"" -frames:v 1 ""{tmpFile}"" -y -loglevel quiet"
+        startInfo.CreateNoWindow = True
+        startInfo.UseShellExecute = False
+        Process.Start(startInfo).WaitForExit()
+
+        ' Cargar el frame
+        Dim bmp As Bitmap
+        Using fs As New FileStream(tmpFile, FileMode.Open, FileAccess.Read, FileShare.Read)
+            bmp = New Bitmap(fs)
+        End Using
+
+        File.Delete(tmpFile)
+        Return bmp
+    End Function
 
 
-    Public Function GetFrame(videoPath As String, segundo As Double) As Bitmap
-        ' Inicializar LibVLC
+    Public Function GetFrameVLC(videoPath As String, segundo As Double) As Bitmap
         Core.Initialize()
 
-        ' Ruta a los binarios nativos VLC
-        Dim vlcPath As String = Path.Combine(Application.StartupPath, "libvlc", "win-x64") ' o win-x86
-
-        Using libVlc As New LibVLC("--no-video-title-show", "--quiet", "--intf", "dummy", "--no-xlib", "--no-video")
+        Using libVlc As New LibVLC()
             Using media As New Media(libVlc, videoPath, FromType.FromPath)
                 Using player As New MediaPlayer(media)
                     player.Play()
-                    Thread.Sleep(200) ' esperar a que arranque
-                    player.Time = CLng(segundo * 1000) ' mover al segundo deseado
-                    Thread.Sleep(200) ' esperar a que decodifique
+
+                    ' Espera a que el video empiece a reproducirse
+                    While player.State <> VLCState.Playing
+                        Thread.Sleep(50)
+                    End While
+
+                    ' Mueve al segundo deseado
+                    player.Time = CLng(segundo * 1000)
+
+                    ' Espera un poco para decodificar el frame
+                    Thread.Sleep(100)
 
                     ' Snapshot temporal
-                    Dim tmpFile As String = Path.Combine(Path.GetTempPath(), "frame.png")
-                    player.TakeSnapshot(0, tmpFile, 0, 0) ' 0,0 = tamaño original
-                    player.Stop()
+                    Dim tmpFile As String = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString() & ".png")
+                    player.TakeSnapshot(0, tmpFile, 0, 0)
 
+                    ' Espera hasta que el archivo exista
+                    Dim timeout As Integer = 5000
+                    Dim waited As Integer = 0
+                    While Not File.Exists(tmpFile) AndAlso waited < timeout
+                        Thread.Sleep(50)
+                        waited += 50
+                    End While
+
+                    ' Si el archivo nunca se creó, devuelve Nothing
+                    If Not File.Exists(tmpFile) Then Return Nothing
+
+                    ' Carga el bitmap
                     Dim bmp As Bitmap = Nothing
-                    Dim maxRetries As Integer = 10
-                    Dim delay As Integer = 100 ' milisegundos
+                    Using fs As New FileStream(tmpFile, FileMode.Open, FileAccess.Read, FileShare.Read)
+                        bmp = New Bitmap(fs)
+                    End Using
 
-                    For i As Integer = 1 To maxRetries
-                        Try
-                            Using fs As New FileStream(tmpFile, FileMode.Open, FileAccess.Read, FileShare.Read)
-                                bmp = New Bitmap(fs)
-                            End Using
+                    ' Borra el archivo temporal
+                    File.Delete(tmpFile)
 
-                            ' Si llegamos aquí, el archivo ya se pudo leer
-                            File.Delete(tmpFile)
-                            Exit For
-                        Catch ex As IOException
-                            Threading.Thread.Sleep(delay) ' esperar un poco y reintentar
-                        End Try
-                    Next
-
+                    player.Stop()
                     Return bmp
-
                 End Using
             End Using
         End Using
     End Function
+
+    Public Function GetFrame(videoFilePath As String, frameNumber As Integer) As Bitmap
+        Try
+            Console.WriteLine("Intentando abrir video: " & videoFilePath)
+            Using capture As New VideoCapture(videoFilePath)
+                If capture Is Nothing Then
+                    Console.WriteLine("VideoCapture es Nothing")
+                End If
+
+                Console.WriteLine("VideoCapture creado")
+                Console.WriteLine("¿Está abierto? " & capture.IsOpened.ToString())
+
+                If Not capture.IsOpened Then
+                    Throw New Exception("No se pudo abrir el video.")
+                End If
+
+                Console.WriteLine("Moviendo al frame " & frameNumber)
+                Dim setResult As Boolean = capture.Set(CapProp.PosFrames, frameNumber)
+                Console.WriteLine("Resultado de Set(PosFrames): " & setResult.ToString())
+
+                Dim frame As New Mat()
+                Dim readResult As Boolean = capture.Read(frame)
+                Console.WriteLine("Resultado de Read(): " & readResult.ToString())
+                Console.WriteLine("Frame vacío: " & frame.IsEmpty.ToString())
+
+                If readResult AndAlso Not frame.IsEmpty Then
+                    Console.WriteLine("Frame leído correctamente")
+                    ' Convertir a Bitmap
+                    Return frame.ToBitmap()
+                Else
+                    Throw New Exception($"No se pudo leer el frame {frameNumber}.")
+                End If
+            End Using
+        Catch ex As Exception
+            Console.WriteLine($"Error: {ex.Message}")
+            Return Nothing
+        End Try
+    End Function
+
+
 
     Public Function AddDynamicFile(originalFile As String) As String
         Dim ext = IO.Path.GetExtension(originalFile).ToLowerInvariant()
