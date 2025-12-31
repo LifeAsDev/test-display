@@ -1,109 +1,93 @@
 ﻿body {
-    background-color: transparent !important;
-    padding: 0;
-    margin: 0;
-    overflow: hidden;
-    height: 100vh;
-    width: 100vw;
+	background-color: transparent !important;
+	padding: 0;
+	margin: 0;
+	overflow: hidden;
+	height: 100vh;
+	width: 100vw;
 }
-html, body {
-    background-color: transparent !important;
-    padding: 0 !important;
-    margin: 0 !important;
+html,
+body {
+	background-color: transparent !important;
+	padding: 0 !important;
+	margin: 0 !important;
 }
 .slashed {
-
-    line-height: 1.2em; /* relativo */
-    text-shadow: 3px 3px 3px rgba(0,0,0,0.5);
-    transform: rotate(-5deg);
-    display: inline-block;
+	line-height: 1.2em; /* relativo */
+	text-shadow: 3px 3px 3px rgba(0, 0, 0, 0.5);
+	transform: rotate(-5deg);
+	display: inline-block;
 }
 
-    .slashed .top,
-    .slashed .bot {
-        position: relative;
-        overflow: hidden;
-        text-align: center;
-        height: 0.6em;
-        padding:0 .5em;
-    }
-
-        .slashed .top::before,
-        .slashed .bot::before {
-            content: attr(title);
-            transform: rotate(5deg);
-            display: inline-block;
-        }
-
-        .slashed .top::before {
-            position: relative;
-            left:.05em;
-        }
-
-        .slashed .bot::before {
-            position: relative;
-            top: -0.6em; /* baja un poco el texto */
-            right:.05em
-        }
-
-
-@keyframes blur {
-    from {
-        text-shadow: 0px 0px 10px #fff, 0px 0px 10px #fff, 0px 0px 25px #fff, 0px 0px 25px #fff, 0px 0px 25px #fff, 0px 0px 25px #fff, 0px 0px 25px #fff, 0px 0px 25px #fff, 0px 0px 50px #fff, 0px 0px 50px #fff, 0px 0px 50px #7B96B8, 0px 0px 150px #7B96B8, 0px 10px 100px #7B96B8, 0px 10px 100px #7B96B8, 0px 10px 100px #7B96B8, 0px 10px 100px #7B96B8, 0px -10px 100px #7B96B8, 0px -10px 100px #7B96B8;
-    }
+.slashed .top,
+.slashed .bot {
+	position: relative;
+	overflow: hidden;
+	text-align: center;
+	height: 0.6em;
+	padding: 0 0.5em;
 }
 
+.slashed .top::before,
+.slashed .bot::before {
+	content: attr(title);
+	transform: rotate(5deg);
+	display: inline-block;
+}
 
+.slashed .top::before {
+	position: relative;
+	left: 0.05em;
+}
+
+.slashed .bot::before {
+	position: relative;
+	top: -0.6em; /* baja un poco el texto */
+	right: 0.05em;
+}
+
+@keyframes glow {
+	from {
+		text-shadow: 0 0 10px #fff, 0 0 30px #7b96b8, 0 0 60px #7b96b8;
+	}
+}
 
 .warningEffect {
-    animation: blur .75s ease-out infinite;
-    text-shadow: 0px 0px 5px #fff, 0px 0px 7px #fff;
+	animation: glow 0.25s ease-in-out infinite alternate;
 }
 
-
 @keyframes blackblur {
-    from {
-        text-shadow: 0 0 72px black;
-        color: transparent;
-    }
+	from {
+		text-shadow: 0 0 72px black;
+		color: transparent;
+	}
 
-    to {
-        text-shadow: 0;
-        color: currentColor;
-    }
+	to {
+		text-shadow: 0;
+		color: currentColor;
+	}
 }
 
 .smokemonster span {
-    animation: blackblur 2s 1 alternate;
-    animation-delay: calc(var(--i) * 0.1s);
+	animation: blackblur 2s 1 alternate;
+	animation-delay: calc(var(--i) * 0.1s);
 }
 
-.fantasma {
-    display: inline;
-    position: relative;
-    color: rgba(0,0,255,0.5) !important;
-    letter-spacing: -0.025em;
+.anaglyph {
+	color: transparent !important; /* o el color base */
+	text-shadow: 0.06em 0.06em 0 rgba(0, 0, 255, 0.5), 0 0 0 rgba(255, 0, 0, 0.5) !important;
 }
-
-    .fantasma::after {
-        content: attr(data-text); /* usa el mismo texto */
-        position: absolute;
-        left: 0.05em;
-        top: 0.025em;
-        color: rgba(255,0,0,0.5);
-        width: 100%;
-    }
 
 img {
 }
 
-
 @keyframes bounce {
-    0%, 100% {
-        transform: translateY(0);
-    }
+	0%,
+	100% {
+		transform: translateY(0);
+	}
 
-    50% {
-        transform: translateY(-10px);
-    }
+	50% {
+		transform: translateY(-10px);
+	}
 }

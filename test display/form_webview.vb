@@ -1,189 +1,115 @@
 ﻿Imports System.Collections.Concurrent
 Imports System.IO
+Imports System.IO.Pipelines
+Imports System.Threading
 Imports EmbedIO
 Imports EmbedIO.Actions
 Imports Emgu.CV
 Imports Emgu.CV.CvEnum
+Imports LibVLCSharp.Shared
 Imports Microsoft.Web.WebView2.Core
 Imports Newtonsoft.Json
-Imports LibVLCSharp.Shared
-Imports System.Threading
+Imports System.Drawing.Imaging
 
-
-Public Enum ObjectFitOption
-    Fill
-    Contain
-    Cover
-    None
-    ScaleDown
-End Enum
 
 Public Class TextoConfig
     Public Property Contenido As String
     Public Property Color As String
-    Public Property FontSize As Integer
+    Public Property FontSize As Integer?
     Public Property FontWeight As String
     Public Property FontFamily As String
     Public Property Align As String
-    Public Property Efecto As Integer
+    Public Property Efecto As Integer?
+    Public Property FontStyle As String
+    Public Property FontDecoration As String
+    Public Property Ancho As Integer = 0
+    Public Property Alto As Integer = 0
+    Public Property PosX As Integer = 0
+    Public Property PosY As Integer = 0
+    Public Property NivelCapa As Integer = 0
+    Public Property Opacidad As Integer = 100
+    Public Property FadeIn As Integer = 0
+    Public Property FadeOut As Integer = 0
+    Public Property RetrasoIn As Integer = 0
+    Public Property RetrasoOut As Integer = 0
+    Public Property Grupo As String = ""
+    Public Property Rotacion As Integer? = Nothing              ' grados
+    Public Property Mayusculas As Boolean = False
+    Public Property Minusculas As Boolean = False
+    Public Property Sombra As String = ""                      ' "3px 3px 6px #000"
+    Public Property TextAlign As String = Nothing ' "left", "center", "right", "justify"
 
+    Public Property WhiteSpace As String = Nothing ' "normal", "nowrap", "pre", "pre-wrap", "pre-line"
 
+    Public Property GrupoId As String = "grupo1"
 End Class
+
 
 Public Class Form_webview
     Private web As Microsoft.Web.WebView2.WinForms.WebView2
     Private server As New MiniServer()
 
-
-    Public Function GetFrameWebM(videoPath As String, segundo As Double) As Bitmap
-        ' Ruta al ffmpeg.exe dentro del proyecto
-        Dim ffmpegPath As String = Path.Combine(Application.StartupPath, "ffmpeg", "ffmpeg.exe")
-        If Not File.Exists(ffmpegPath) Then
-            Throw New FileNotFoundException("No se encontró ffmpeg.exe", ffmpegPath)
-        End If
-        ' Archivo temporal para el frame
-        Dim tmpFile As String = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString() & ".png")
-
-        ' Argumentos: -ss = segundo, -i = video, -frames:v 1 = solo 1 frame, -y = sobrescribir
-        Dim args As String = $"-ss {segundo} -i ""{videoPath}"" -frames:v 1 ""{tmpFile}"" -y -loglevel quiet"
-
-        ' Configurar proceso FFmpeg
-        Dim startInfo As New ProcessStartInfo With {
-        .FileName = ffmpegPath,
-        .Arguments = args,
-        .CreateNoWindow = True,
-        .UseShellExecute = False,
-        .RedirectStandardOutput = False,
-        .RedirectStandardError = False
-    }
-
-        Using proc As Process = Process.Start(startInfo)
-            proc.WaitForExit()
-        End Using
-
-        ' Cargar el frame en Bitmap
-        Dim bmp As Bitmap
-        Using fs As New FileStream(tmpFile, FileMode.Open, FileAccess.Read, FileShare.Read)
-            bmp = New Bitmap(fs)
-        End Using
-
-        ' Borrar archivo temporal
-        File.Delete(tmpFile)
-
-        Return bmp
-    End Function
-
-    Public Function GetFrameLight(videoPath As String, segundo As Double) As Bitmap
-        Dim tmpFile As String = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString() & ".png")
-
-        ' Llama a ffmpeg.exe directamente
-        Dim startInfo As New ProcessStartInfo()
-        startInfo.FileName = Path.Combine(Application.StartupPath, "ffmpeg.exe") ' solo 30 MB
-        startInfo.Arguments = $"-ss {segundo} -i ""{videoPath}"" -frames:v 1 ""{tmpFile}"" -y -loglevel quiet"
-        startInfo.CreateNoWindow = True
-        startInfo.UseShellExecute = False
-        Process.Start(startInfo).WaitForExit()
-
-        ' Cargar el frame
-        Dim bmp As Bitmap
-        Using fs As New FileStream(tmpFile, FileMode.Open, FileAccess.Read, FileShare.Read)
-            bmp = New Bitmap(fs)
-        End Using
-
-        File.Delete(tmpFile)
-        Return bmp
-    End Function
-
-
-    Public Function GetFrameVLC(videoPath As String, segundo As Double) As Bitmap
-        Core.Initialize()
-
-        Using libVlc As New LibVLC()
-            Using media As New Media(libVlc, videoPath, FromType.FromPath)
-                Using player As New MediaPlayer(media)
-                    player.Play()
-
-                    ' Espera a que el video empiece a reproducirse
-                    While player.State <> VLCState.Playing
-                        Thread.Sleep(50)
-                    End While
-
-                    ' Mueve al segundo deseado
-                    player.Time = CLng(segundo * 1000)
-
-                    ' Espera un poco para decodificar el frame
-                    Thread.Sleep(100)
-
-                    ' Snapshot temporal
-                    Dim tmpFile As String = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString() & ".png")
-                    player.TakeSnapshot(0, tmpFile, 0, 0)
-
-                    ' Espera hasta que el archivo exista
-                    Dim timeout As Integer = 5000
-                    Dim waited As Integer = 0
-                    While Not File.Exists(tmpFile) AndAlso waited < timeout
-                        Thread.Sleep(50)
-                        waited += 50
-                    End While
-
-                    ' Si el archivo nunca se creó, devuelve Nothing
-                    If Not File.Exists(tmpFile) Then Return Nothing
-
-                    ' Carga el bitmap
-                    Dim bmp As Bitmap = Nothing
-                    Using fs As New FileStream(tmpFile, FileMode.Open, FileAccess.Read, FileShare.Read)
-                        bmp = New Bitmap(fs)
-                    End Using
-
-                    ' Borra el archivo temporal
-                    File.Delete(tmpFile)
-
-                    player.Stop()
-                    Return bmp
-                End Using
-            End Using
-        End Using
-    End Function
-
-    Public Function GetFrame(videoFilePath As String, frameNumber As Integer) As Bitmap
+    Public Async Function GetFrame(rutaVideo As String, segundo As Double) As Task(Of String)
         Try
-            Console.WriteLine("Intentando abrir video: " & videoFilePath)
-            Using capture As New VideoCapture(videoFilePath)
-                If capture Is Nothing Then
-                    Console.WriteLine("VideoCapture es Nothing")
-                End If
+            Await web.EnsureCoreWebView2Async()
 
-                Console.WriteLine("VideoCapture creado")
-                Console.WriteLine("¿Está abierto? " & capture.IsOpened.ToString())
+            Dim carpeta As String = IO.Path.GetDirectoryName(rutaVideo)
+            Dim nombreArchivo As String = IO.Path.GetFileName(rutaVideo)
+            MsgBox("carpeta: " & carpeta)
 
-                If Not capture.IsOpened Then
-                    Throw New Exception("No se pudo abrir el video.")
-                End If
+            ' 2️⃣ Mapear carpeta a host virtual
+            web.CoreWebView2.SetVirtualHostNameToFolderMapping(
+            "video.assets",
+            carpeta,
+          CoreWebView2HostResourceAccessKind.Allow
+        )
+            Await Task.Delay(50) ' esperar que WebView2 registre el host virtual
 
-                Console.WriteLine("Moviendo al frame " & frameNumber)
-                Dim setResult As Boolean = capture.Set(CapProp.PosFrames, frameNumber)
-                Console.WriteLine("Resultado de Set(PosFrames): " & setResult.ToString())
+            ' 3️⃣ URL virtual para JS
+            Dim urlVideo As String = "file:///" & rutaVideo.Replace("\", "/")
+            MsgBox("urlVideo: " & urlVideo)
 
-                Dim frame As New Mat()
-                Dim readResult As Boolean = capture.Read(frame)
-                Console.WriteLine("Resultado de Read(): " & readResult.ToString())
-                Console.WriteLine("Frame vacío: " & frame.IsEmpty.ToString())
+            Dim jsCall As String = $"
+(async () => {{
+console.log('{urlVideo}');
+    const video = document.createElement('video');
+    video.src = '{urlVideo}';
+    video.crossOrigin = 'anonymous';
+    
+    await video.play().catch(()=>{{}}); // Necesario para que cargue algunos videos
+    video.pause(); // Solo necesitamos cargar metadata
+    
+    await new Promise(resolve => video.onloadedmetadata = resolve);
 
-                If readResult AndAlso Not frame.IsEmpty Then
-                    Console.WriteLine("Frame leído correctamente")
-                    ' Convertir a Bitmap
-                    Return frame.ToBitmap()
-                Else
-                    Throw New Exception($"No se pudo leer el frame {frameNumber}.")
-                End If
-            End Using
+    // Calculamos el tiempo del frame 10
+    const fps = 30; // Ajusta según tu video
+    video.currentTime = 10 / fps;
+
+    await new Promise(resolve => video.onseeked = resolve);
+
+    const canvas = document.createElement('canvas');
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+    // Guardamos el frame 10 como Base64
+    window._tmpResult = canvas.toDataURL('image/png');
+    return window._tmpResult;
+}})();
+"
+
+            Dim result As String = Await web.CoreWebView2.ExecuteScriptAsync(jsCall)
+            MsgBox(result) 'Esto será un data:image/png;base64,…
+
+
+            Return result
+
         Catch ex As Exception
-            Console.WriteLine($"Error: {ex.Message}")
+            MsgBox("EXCEPCIÓN VB: " & ex.Message)
             Return Nothing
         End Try
     End Function
-
-
 
     Public Function AddDynamicFile(originalFile As String) As String
         Dim ext = IO.Path.GetExtension(originalFile).ToLowerInvariant()
@@ -191,6 +117,12 @@ Public Class Form_webview
         MiniServer.DynamicFiles(fileId) = originalFile
         Return $"http://localhost:5000/file/{fileId}"
     End Function
+
+    Private Sub WebView2_PermissionRequested(sender As Object, e As CoreWebView2PermissionRequestedEventArgs)
+        If e.PermissionKind = CoreWebView2PermissionKind.Camera Then
+            e.State = CoreWebView2PermissionState.Allow   ' ✔ permitir cámara
+        End If
+    End Sub
 
     Private Async Sub Form_webview_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         ' Iniciar mini servidor
@@ -203,18 +135,21 @@ Public Class Form_webview
 
         ' Crear WebView2
         Dim env = Await CoreWebView2Environment.CreateAsync(
-    Nothing,
-    Nothing,
-    New CoreWebView2EnvironmentOptions("--enable-gpu-rasterization --enable-zero-copy --ignore-gpu-blocklist --use-gl=d3d11 --enable-accelerated-video-decode")
-)
+        Nothing,
+        Nothing,
+        New CoreWebView2EnvironmentOptions("--enable-gpu-rasterization --enable-zero-copy --ignore-gpu-blocklist --use-gl=d3d11 --enable-accelerated-video-decode")
+    )
         web = New Microsoft.Web.WebView2.WinForms.WebView2 With {
-            .Dock = DockStyle.Fill
-        }
+                .Dock = DockStyle.Fill
+            }
         Me.Controls.Add(web)
         Me.StartPosition = FormStartPosition.Manual
         Me.Location = New Point(0, 0)
         ' Inicializar WebView2 y navegar a localhost
         Await web.EnsureCoreWebView2Async(env)
+        web.CoreWebView2.Settings.AreHostObjectsAllowed = True
+
+        AddHandler web.CoreWebView2.PermissionRequested, AddressOf WebView2_PermissionRequested
 
         web.DefaultBackgroundColor = Color.Transparent ' <-- clave
         'web.CoreWebView2.Navigate("http://localhost:5000/")
@@ -223,6 +158,14 @@ Public Class Form_webview
         AddHandler web.CoreWebView2.WebResourceRequested, AddressOf OnWebResourceRequested
         ' Navegar directamente al archivo local
         web.CoreWebView2.Navigate("file:///" & htmlPath.Replace("\", "/"))
+        'web.CoreWebView2.Navigate("http://localhost:5000/")
+        If web Is Nothing Then
+            Throw New Exception("El control WebView2 es Nothing.")
+        End If
+
+        If web.CoreWebView2 Is Nothing Then
+            Throw New Exception("CoreWebView2 aún no está inicializado.")
+        End If
         'Xpcom.Initialize("C:\Users\Angelo\Desktop\project\test display\test display\Firefox\") ' <-- Cambia por tu ruta
 
         ' Crear el GeckoWebBrowser
@@ -238,6 +181,11 @@ Public Class Form_webview
         '    browser.Navigate("localhost:5000")
     End Sub
 
+    Private Sub SoftResetWebView()
+        If web?.CoreWebView2 IsNot Nothing Then
+            web.CoreWebView2.Reload()
+        End If
+    End Sub
 
     ' Diccionario para almacenar Bitmaps en memoria
     Private bitmapsMemoria As New Dictionary(Of String, Bitmap)()
@@ -284,12 +232,34 @@ Public Class Form_webview
     End Sub
 
 
+    Public Function BitmapToBase64(
+    bmp As Bitmap,
+    Optional calidadJpeg As Long = 80
+) As String
 
+        Using ms As New MemoryStream()
+
+            Dim codec = ImageCodecInfo.GetImageEncoders().
+            First(Function(c) c.FormatID = ImageFormat.Jpeg.Guid)
+
+            Dim encParams As New EncoderParameters(1)
+            encParams.Param(0) = New EncoderParameter(
+            System.Drawing.Imaging.Encoder.Quality,
+            calidadJpeg
+        )
+
+            bmp.Save(ms, codec, encParams)
+
+            Dim base64 = Convert.ToBase64String(ms.ToArray())
+            Return "data:image/jpeg;base64," & base64
+
+        End Using
+
+    End Function
     Public Async Sub AgregarObjetoDisplay(
         IdGrupo As String,
         Id As String,
         Optional Url As String = "",
-        Optional Texto As TextoConfig = Nothing,
         Optional Ancho As Integer = 200,
         Optional Alto As Integer = 200,
         Optional PosX As Integer = 0,
@@ -299,16 +269,31 @@ Public Class Form_webview
         Optional Retraso As Integer = 0,
         Optional FadeIn As Integer = 0,
         Optional FadeOut As Integer = 0,
-        Optional ObjectFit As String = "contain")
+        Optional RetrasoOut As Integer = 0,
+        Optional ObjectFit As String = "contain",
+        Optional Replace As Boolean = False,
+        Optional Mute As Boolean = False,
+        Optional LoopVideo As Boolean = False,
+        Optional CierrateAlAcabar As Boolean = True,
+        Optional Rotacion As Integer = 0,
+        Optional VoltearHorizontal As Boolean = False,
+        Optional VoltearVertical As Boolean = False
+)
 
 
+        If web Is Nothing Then
+            Throw New Exception("El control WebView2 es Nothing.")
+        End If
+
+        If web.CoreWebView2 Is Nothing Then
+            Throw New Exception("CoreWebView2 aún no está inicializado.")
+        End If
 
         ' Crear objeto de configuración
         Dim config = New With {
         IdGrupo,
         Id,
         .Url = Url.Replace("\", "\\"),
-        Texto,
         Ancho,
         Alto,
         PosX,
@@ -318,7 +303,15 @@ Public Class Form_webview
         Retraso,
         FadeIn,
         FadeOut,
-        ObjectFit
+        RetrasoOut,
+        ObjectFit,
+        Replace,
+        Mute,
+        LoopVideo,
+        CierrateAlAcabar,
+        Rotacion,
+        VoltearHorizontal,
+        VoltearVertical
     }
 
         ' Serializar a JSON usando Newtonsoft
@@ -333,6 +326,27 @@ Public Class Form_webview
         Await web.CoreWebView2.ExecuteScriptAsync($"setVideoBucle('{id}', {valor.ToString().ToLower()});")
     End Sub
 
+    Public Async Sub DebugHighlight(id As String)
+        Await web.CoreWebView2.ExecuteScriptAsync($"debugHighlight('{id}');")
+    End Sub
+
+    Public Async Sub DLL7_OcultaGrupo(idGrupo As String)
+        If web.CoreWebView2 IsNot Nothing Then
+            Await web.CoreWebView2.ExecuteScriptAsync(
+            $"ocultaGrupo('{idGrupo}');"
+        )
+        End If
+    End Sub
+
+    Public Async Sub DLL7_MostrarGrupo(idGrupo As String)
+        If web.CoreWebView2 IsNot Nothing Then
+            Await web.CoreWebView2.ExecuteScriptAsync(
+            $"mostrarGrupo('{idGrupo}');"
+        )
+        End If
+    End Sub
+
+
     Public Async Sub DLL_CambiaOpacidad(id As String, valor As Integer)
         Await web.CoreWebView2.ExecuteScriptAsync($"cambiaOpacidad('{id}', {valor});")
     End Sub
@@ -345,28 +359,85 @@ Public Class Form_webview
         Await web.CoreWebView2.ExecuteScriptAsync($"mostrarObjeto('{id}');")
     End Sub
 
-    Public Async Sub DLL_EliminaObjeto(id As String)
-        Await web.CoreWebView2.ExecuteScriptAsync($"eliminaObjeto('{id}');")
+    Public Async Sub DLL_EliminarGrupo(
+    idgrupo As String,
+    Optional retraso As Integer = 0,
+    Optional FadeOut As Integer = 0)
+        Await web.CoreWebView2.ExecuteScriptAsync(
+            $"eliminarPorGrupoId('{idgrupo}',{retraso} , {FadeOut});")
     End Sub
 
-    Public Async Sub DLL_EditarTexto(id As String, contenido As String, Optional color As String = Nothing, Optional fontSize As Integer = 0, Optional fontWeight As String = Nothing, Optional fontFamily As String = Nothing, Optional align As String = Nothing, Optional efecto As Integer = -1)
-        Dim opciones = New System.Collections.Generic.Dictionary(Of String, Object)()
+    Public Async Sub DLL_EliminaObjeto(
+    id As String,
+    Optional Retraso As Integer = 0,
+    Optional FadeOut As Integer = 0
+)
+        Await web.CoreWebView2.ExecuteScriptAsync(
+        $"eliminaObjeto('{id}', {Retraso} , {FadeOut});"
+    )
+    End Sub
 
-        If contenido IsNot Nothing Then opciones("Contenido") = contenido
-        If Not String.IsNullOrEmpty(color) Then opciones("Color") = color
-        If fontSize > 0 Then opciones("FontSize") = fontSize
-        If Not String.IsNullOrEmpty(fontWeight) Then opciones("FontWeight") = fontWeight
-        If Not String.IsNullOrEmpty(fontFamily) Then opciones("FontFamily") = fontFamily
-        If Not String.IsNullOrEmpty(align) Then opciones("Align") = align
-        If efecto >= 0 Then opciones("Efecto") = efecto
+    Public Async Sub DLL_PintarPunto(id As String,
+                                 posX As Integer,
+                                 posY As Integer,
+                                 ancho As Integer,
+                                 alto As Integer,
+                                 grosor As String,
+                                 color As String,
+                                 align As Integer,
+                                 Optional duracionMs As Integer = 3000)
 
+        Dim script As String =
+        $"pintarPunto('{id}', {posX}, {posY}, {ancho}, {alto}, '{grosor}', '{color}',{align}, {duracionMs});"
 
-        Dim opcionesJson = Newtonsoft.Json.JsonConvert.SerializeObject(opciones, New Newtonsoft.Json.JsonSerializerSettings With {.NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore})
-        ' id correctamente escapado como string JSON:
-        Dim js = $"editarTexto({Newtonsoft.Json.JsonConvert.ToString(id)}, {opcionesJson});"
+        Await web.CoreWebView2.ExecuteScriptAsync(script)
+    End Sub
+
+    Public Async Sub DLL_PintarCuadro(id As String,
+                                  posX As Integer,
+                                  posY As Integer,
+                                  ancho As Integer,
+                                  alto As Integer,
+                                  Optional grosor As String = "2px",
+                                  Optional color As String = "blue",
+                                  Optional duracionMs As Integer = 3000)
+
+        Dim script As String =
+        $"pintarCuadro('{id}', {posX}, {posY}, {ancho}, {alto}, '{grosor}', '{color}', {duracionMs});"
+
+        Await web.CoreWebView2.ExecuteScriptAsync(script)
+    End Sub
+
+    Public Async Sub DLL_BorrarGuia(id As String)
+        Dim script As String = $"borrarElemento('{id}');"
+        Await web.CoreWebView2.ExecuteScriptAsync(script)
+    End Sub
+    Public Async Sub DLL_BorrarGuias()
+        Dim script As String = "borrarTodos();"
+        Await web.CoreWebView2.ExecuteScriptAsync(script)
+    End Sub
+
+    Public Async Sub DLL_AgregarTexto(id As String, cfg As TextoConfig, replace As Boolean)
+
+        If cfg Is Nothing Then
+            Throw New ArgumentNullException(NameOf(cfg))
+        End If
+
+        ' Serializar sin nulls
+        Dim opcionesJson = Newtonsoft.Json.JsonConvert.SerializeObject(
+        cfg,
+        New Newtonsoft.Json.JsonSerializerSettings With {
+            .NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore
+        }
+    )
+        Dim replaceJson = Newtonsoft.Json.JsonConvert.SerializeObject(replace)
+
+        ' id como string JSON seguro
+        Dim js = $"agregarTexto({Newtonsoft.Json.JsonConvert.ToString(id)}, {opcionesJson}, {replaceJson});"
+
         Await web.CoreWebView2.ExecuteScriptAsync(js)
-    End Sub
 
+    End Sub
 
 
     Public Async Sub ClearAllElements()

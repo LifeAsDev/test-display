@@ -1,5 +1,7 @@
 ﻿Imports System.Collections.Concurrent
 Imports System.Drawing
+Imports System.IO
+Imports Emgu.CV.Dnn
 
 Public Class Form2
     Inherits Form
@@ -10,7 +12,6 @@ Public Class Form2
     Private Sub Form2_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         ' Conectar eventos de los botones del Designer
         AddHandler BtnAgregar.Click, AddressOf BtnAgregar_Click
-        AddHandler BtnTexto.Click, AddressOf BtnAgregarTexto_Click
         AddHandler BtnClear.Click, Sub() webForm.ClearAllElements()
 
         AddHandler BtnLoop.Click, AddressOf BtnSetVideoBucle_Click
@@ -36,40 +37,67 @@ Public Class Form2
 
     Private Sub BtnAgregar_Click(sender As Object, e As EventArgs)
 
-
-        ' Abrir OpenFileDialog
         Dim ofd As New OpenFileDialog With {
-            .Filter = "Archivos multimedia|*.png;*.jpg;*.gif;*.mp4;*.avi;*.webm|Todos los archivos|*.*"
-        }
+        .Filter = "Archivos multimedia|*.png;*.jpg;*.jpeg;*.gif;*.mp4;*.avi;*.webm|Todos los archivos|*.*"
+    }
+
         If ofd.ShowDialog() <> DialogResult.OK Then Return
 
-        ' Obtener valores de los NUD del Designer
         Dim posX = CInt(NUDPosX.Value)
         Dim posY = CInt(NUDPosY.Value)
         Dim ancho = CInt(NUDAncho.Value)
         Dim alto = CInt(NUDAlto.Value)
         Dim opacidad = CInt(NUDOpacidad.Value)
-        Dim fileUri = New Uri(ofd.FileName)
-        Dim url = fileUri.AbsoluteUri
         Dim objectFitSeleccionado As String = ComboBox2.SelectedItem.ToString()
+
         ultimoId = Guid.NewGuid().ToString()
 
-        'enviar al webview
+        Dim filePath As String = ofd.FileName
+        Dim ext As String = Path.GetExtension(filePath).ToLower()
+
+        Dim urlFinal As String
+
+        ' =========================
+        ' 🖼️ IMAGEN → Bitmap → Base64
+        ' =========================
+        If {".png", ".jpg", ".jpeg", ".gif", ".bmp"}.Contains(ext) Then
+
+            Using bmp As New Bitmap(filePath)
+                urlFinal = Form_webview.BitmapToBase64(bmp, 75)
+            End Using
+
+        Else
+            ' =========================
+            ' 🎥 VIDEO → file://
+            ' =========================
+            urlFinal = New Uri(filePath).AbsoluteUri
+        End If
+
+        ' =========================
+        ' 🚀 Enviar al WebView
+        ' =========================
         webForm.AgregarObjetoDisplay(
         IdGrupo:="grupo1",
         Id:=ultimoId,
-        Url:=url,
-           Ancho:=ancho,
+        Url:=urlFinal,
+        Ancho:=ancho,
         Alto:=alto,
         PosX:=posX,
         PosY:=posY,
         NivelCapa:=1,
-          Opacidad:=opacidad,
-        Retraso:=500,
-        FadeIn:=500,
-        FadeOut:=0,
-        ObjectFit:=objectFitSeleccionado
-        )
+        Opacidad:=opacidad,
+        Retraso:=2000,
+        FadeIn:=2000,
+        FadeOut:=4000,
+        RetrasoOut:=0,
+        ObjectFit:=objectFitSeleccionado,
+        LoopVideo:=True,
+        Replace:=True,
+        Rotacion:=0,
+        VoltearHorizontal:=True,
+        VoltearVertical:=False
+    )
+
     End Sub
 
     Private Sub BtnAgregarTest_Click(sender As Object, e As EventArgs) Handles Button1.Click
@@ -108,131 +136,77 @@ Public Class Form2
         Next
     End Sub
 
-    Private Sub BtnAgregarTexto_Click(sender As Object, e As EventArgs)
+    Private Async Sub BtnAgregarTexto_Click(sender As Object, e As EventArgs) Handles BtnTexto.Click
 
-        Dim efectoSeleccionado As Integer = ComboBox1.SelectedIndex
+        'Dim ruta As String = "C:\Users\Angelo\Downloads\archivos test v72\caminante.webm"
+        '' 1. Obtener bitmap del frame
+        'Dim bmp As String = Await webForm.GetFrame(ruta, 1.0)
 
+        '    ' 2. Guardarlo como archivo temporal PNG
+        '    Dim tempFile As String = Path.Combine(
+        '    Path.GetTempPath(),
+        '    "frame_" & Guid.NewGuid().ToString() & ".png"
+        ')
+        '    bmp.Save(tempFile, Imaging.ImageFormat.Png)
 
-        ''fondo
-        'webForm.AgregarObjetoDisplay(IdGrupo:="grupo0", Id:=Guid.NewGuid().ToString(), Url:=GetFileUrl("C:\Users\Angelo\Downloads\archivos test v72\fondo.png"),
-        'Ancho:=1248, Alto:=624,
-        'PosX:=0, PosY:=0,
-        'NivelCapa:=1, Opacidad:=100, Retraso:=0, FadeIn:=0, FadeOut:=0, ObjectFit:="fill")
+        '    ' (opcional pero recomendado)
+        '    bmp.Dispose()
 
-        ''mask
-        'webForm.AgregarObjetoDisplay(IdGrupo:="grupo1", Id:=Guid.NewGuid().ToString(), Url:=GetFileUrl("C:\Users\Angelo\Downloads\archivos test v72\mask.png"),
-        'Ancho:=1248, Alto:=624,
-        'PosX:=0, PosY:=0,
-        'NivelCapa:=2, Opacidad:=100, Retraso:=0, FadeIn:=0, FadeOut:=0)
+        '    ultimoId = Guid.NewGuid().ToString()
+        '    webForm.AgregarObjetoDisplay(
+        'IdGrupo:="grupo1",
+        'Id:="cam1",
+        'Url:="camera",
+        'PosX:=100,
+        'PosY:=100,
+        'Ancho:=400,
+        'Alto:=300
+        ')
+        Dim Efecto As Integer = CInt(ComboBox1.SelectedItem)
 
-        ''prc
-        'webForm.AgregarObjetoDisplay(IdGrupo:="grupo1", Id:=Guid.NewGuid().ToString(), Url:=GetFileUrl("C:\Users\Angelo\Downloads\archivos test v72\precioled.webm"),
-        'Ancho:=450, Alto:=450,
-        'PosX:=-90, PosY:=100,
-        'NivelCapa:=5, Opacidad:=100, Retraso:=0, FadeIn:=1000, FadeOut:=0)
-
-        ''uda
-        'webForm.AgregarObjetoDisplay(IdGrupo:="grupo1", Id:=Guid.NewGuid().ToString(), Url:=GetFileUrl("C:\Users\Angelo\Downloads\archivos test v72\uda.webm"),
-        'Ancho:=450, Alto:=450,
-        'PosX:=870, PosY:=100,
-        'NivelCapa:=5, Opacidad:=100, Retraso:=0, FadeIn:=1000, FadeOut:=0)
-
-
-        ''pepsi1
-        'webForm.AgregarObjetoDisplay(IdGrupo:="grupo1", Id:=Guid.NewGuid().ToString(), Url:=GetFileUrl("C:\Users\Angelo\Downloads\archivos test v72\pepsi.webm"),
-        'Ancho:=80, Alto:=80,
-        'PosX:=124, PosY:=10,
-        'NivelCapa:=10, Opacidad:=100, Retraso:=0, FadeIn:=1000, FadeOut:=0)
-
-        ''pepsi2
-        'webForm.AgregarObjetoDisplay(IdGrupo:="grupo1", Id:=Guid.NewGuid().ToString(), Url:=GetFileUrl("C:\Users\Angelo\Downloads\archivos test v72\pepsi.webm"),
-        'Ancho:=80, Alto:=80,
-        'PosX:=1044, PosY:=10,
-        'NivelCapa:=10, Opacidad:=100, Retraso:=0, FadeIn:=1000, FadeOut:=0)
-
-        ''animar
-        'webForm.AgregarObjetoDisplay(IdGrupo:="grupo1", Id:=Guid.NewGuid().ToString(), Url:=GetFileUrl("C:\Users\Angelo\Downloads\archivos test v72\animo.webm"),
-        'Ancho:=1248, Alto:=300,
-        'PosX:=0, PosY:=330,
-        'NivelCapa:=10, Opacidad:=100, Retraso:=0, FadeIn:=1000, FadeOut:=0)
+        '      webForm.AgregarObjetoDisplay(IdGrupo:="grupo1", Id:="id", Url:="", Texto:=New TextoConfig With {
+        '.Contenido = "Linea 1" & vbLf & "Linea 2" & vbLf & "Linea 3",
+        '.Color = "#F54927", '"#" & color.ToArgb.ToString("X6"),
+        '.FontSize = 60,
+        '.FontWeight = "bold",
+        '.FontFamily = "Montserrat", .FontStyle = "normal",
+        '.FontDecoration = "none",
+        '.Align = "center",
+        '.Efecto = Efecto},
+        'Ancho:=0, Alto:=0,
+        'PosX:=Left,
+        'PosY:=Top,
+        'NivelCapa:=12,
+        'Opacidad:=100,
+        'Retraso:=0, FadeIn:=0, FadeOut:=0)
 
 
 
-
-        ' Obtener valores de los NUD del Designer
-        Dim posX = CInt(NUDPosX.Value)
-        Dim posY = CInt(NUDPosY.Value)
-        Dim ancho = CInt(NUDAncho.Value)
-        Dim alto = CInt(NUDAlto.Value)
-        Dim opacidad = CInt(NUDOpacidad.Value)
-        Dim textoContenido = TxtContenido.Text
-
-        'If String.IsNullOrWhiteSpace(textoContenido) Then
-        '    Return
-        'End If
-        Dim objectFitSeleccionado As String = ComboBox2.SelectedItem.ToString()
         ultimoId = Guid.NewGuid().ToString()
 
-        '' Enviar al WebView como objeto de texto
-        'webForm.AgregarObjetoDisplay(
-        '    IdGrupo:="grupo1",
-        '    Id:=ultimoId,
-        '    Texto:=New TextoConfig With {
-        '        .Contenido = "<span style='background-color:yellow;'>123456</span>",
-        '        .Color = "black",
-        '        .FontSize = 48,
-        '        .FontWeight = "bold",
-        '        .FontFamily = "Montserrat",
-        '        .Align = "left",
-        '        .Efecto = efectoSeleccionado
-        '    },
-        '    Ancho:=ancho,
-        '    Alto:=alto,
-        '    PosX:=posX,
-        '    PosY:=posY,
-        '    NivelCapa:=2,
-        '    Opacidad:=opacidad,
-        '    Retraso:=0,
-        '    FadeIn:=400,
-        '    FadeOut:=0,
-        '    ObjectFit:=objectFitSeleccionado
-        ')
-
-        Dim bmp = webForm.GetFrameWebM("C:\Users\Angelo\Downloads\archivos test v72\animo.webm", 1)
-
-
-        Dim url As String
-        If bmp IsNot Nothing Then
-            url = webForm.GuardarBitmap("miImagen1.png", bmp)
-            webForm.AgregarObjetoDisplay(IdGrupo:="grupo1", Id:=Guid.NewGuid().ToString(), Url:=url,
-        Ancho:=1248, Alto:=300,
-        PosX:=0, PosY:=330,
-        NivelCapa:=10, Opacidad:=100, Retraso:=0, FadeIn:=1000, FadeOut:=0)
-
-
-        Else
-            MessageBox.Show("No se pudo obtener el frame. El formato o el número de frame puede ser incorrecto.")
-        End If
-
-
-
-
-
-        webForm.AgregarObjetoDisplay(IdGrupo:="grupo1", Id:="reloj", Texto:=New TextoConfig With {
-    .Contenido = "12:43",
-    .Color = "#F54927",
-    .FontSize = 60,
+        Dim cfg2 As New TextoConfig With {
+    .Contenido = " Coopper, este es un texto<br> largdsadadadaddasd ", .Color = "yellow",
+    .FontSize = 50,
     .FontWeight = "bold",
     .FontFamily = "Montserrat",
-    .Align = "center",
-    .Efecto = 1},
-Ancho:=0, Alto:=0,
-PosX:=960,
-PosY:=10,
-NivelCapa:=12,
-Opacidad:=100,
-Retraso:=0, FadeIn:=400, FadeOut:=0)
-        webForm.DLL_EditarTexto("reloj", "🍒 Cherry\n🍋 Lemon\n🔔 Bell\n💎 Diamond", efecto:=13)
+    .Align = "left",
+    .Efecto = Efecto,
+    .PosX = 400,
+    .PosY = 200,
+    .FadeIn = 500,      ' tiempo en ms
+    .RetrasoIn = 2000,     ' ms antes de iniciar fade in
+    .Minusculas = True,
+    .Rotacion = 0,
+    .FadeOut = 1000,
+    .Sombra = "3px 3px 6px black",
+    .TextAlign = "right",   ' alineación dentro del recuadr
+    .WhiteSpace = "nowrap"
+}
+
+
+
+        webForm.DLL_AgregarTexto(ultimoId, cfg2, True)
+
 
     End Sub
 
@@ -252,7 +226,6 @@ Retraso:=0, FadeIn:=400, FadeOut:=0)
     Private Sub BtnSetVideoBucle_Click(sender As Object, e As EventArgs)
         If ultimoId <> "" Then
             webForm.DLL_SetVideoBucle(ultimoId, False) ' True = con loop
-            webForm.DLL_EditarTexto(ultimoId, "<b>Nuevo</b>", efecto:=1)
 
         End If
     End Sub
@@ -265,7 +238,7 @@ Retraso:=0, FadeIn:=400, FadeOut:=0)
 
     Private Sub BtnOcultaObjeto_Click(sender As Object, e As EventArgs)
         If ultimoId <> "" Then
-            webForm.DLL_OcultaObjeto(ultimoId)
+            webForm.DLL_EliminarGrupo("grupo1", 0, 0)
         End If
     End Sub
 
@@ -277,7 +250,8 @@ Retraso:=0, FadeIn:=400, FadeOut:=0)
 
     Private Sub BtnEliminaObjeto_Click(sender As Object, e As EventArgs)
         If ultimoId <> "" Then
-            webForm.DLL_EliminaObjeto(ultimoId)
+            webForm.DLL_EliminaObjeto(ultimoId, 1000)
+
         End If
     End Sub
 
@@ -298,8 +272,40 @@ Retraso:=0, FadeIn:=400, FadeOut:=0)
 
 
     Private Sub NUDPosX_ValueChanged(sender As Object, e As EventArgs) Handles NUDPosX.ValueChanged
+        ' si no existe aún un objeto agregado, no hagas nada
+        If String.IsNullOrEmpty(ultimoId) Then Exit Sub
+
+        ' Obtener valores actuales del formulario
+        Dim posX = CInt(NUDPosX.Value)
+        Dim posY = CInt(NUDPosY.Value)
+        Dim ancho = CInt(NUDAncho.Value)
+        Dim alto = CInt(NUDAlto.Value)
+        Dim opacidad = CInt(NUDOpacidad.Value)
+        Dim objectFitSeleccionado As String = ComboBox2.SelectedItem.ToString()
+
+        webForm.DLL_PintarCuadro("guidesBox", 100, 100, 100, 100, "4px", "red")
+
+        ' Usar nuevamente la misma URL almacenada del objeto previo
+        ' (si no la guardaste, me dices y la agregamos a una variable global)
+
+        ' Actualizar objeto existente
+        '    webForm.AgregarObjetoDisplay(
+        '    IdGrupo:="grupo1",
+        '    Id:=ultimoId,
+        '    Ancho:=ancho,
+        '    Alto:=alto,
+        '    PosX:=posX,
+        '    PosY:=posY,
+        '    NivelCapa:=1,
+        '    Opacidad:=opacidad,
+        '    Retraso:=0,
+        '    FadeIn:=0,
+        '    FadeOut:=0,
+        '    ObjectFit:=objectFitSeleccionado
+        ')
 
     End Sub
+
 
     Private Sub Label1_Click(sender As Object, e As EventArgs) Handles Label1.Click
 
@@ -308,4 +314,6 @@ Retraso:=0, FadeIn:=400, FadeOut:=0)
     Private Sub DisplayAncho_ValueChanged(sender As Object, e As EventArgs) Handles DisplayAncho.ValueChanged
 
     End Sub
+
+
 End Class
