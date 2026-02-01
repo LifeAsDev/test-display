@@ -128,12 +128,14 @@ Public Class Form2
             PosY:=posY,
             NivelCapa:=1 + i,       ' capas ascendentes
             Opacidad:=opacidad,
-            Retraso:=500,
+            Retraso:=1000,
             FadeIn:=500,
             FadeOut:=0,
             ObjectFit:=objectFitSeleccionado
         )
         Next
+
+        webForm.DLL_EliminarGrupo("grupo1", 5000, 0)
     End Sub
 
     Private Async Sub BtnAgregarTexto_Click(sender As Object, e As EventArgs) Handles BtnTexto.Click
@@ -183,6 +185,10 @@ Public Class Form2
 
 
         ultimoId = Guid.NewGuid().ToString()
+        Dim rnd As New Random()
+
+        Dim offsetX As Integer = rnd.Next(-100, 101) ' -100 a 100
+        Dim offsetY As Integer = rnd.Next(-100, 101) ' -100 a 100
 
         Dim cfg2 As New TextoConfig With {
     .Contenido = " Coopper, este es un texto<br> largdsadadadaddasd ", .Color = "yellow",
@@ -191,13 +197,13 @@ Public Class Form2
     .FontFamily = "Montserrat",
     .Align = "left",
     .Efecto = Efecto,
-    .PosX = 400,
-    .PosY = 200,
-    .FadeIn = 500,      ' tiempo en ms
-    .RetrasoIn = 2000,     ' ms antes de iniciar fade in
+    .PosX = 400 + offsetX,
+    .PosY = 200 + offsetY,
+    .FadeIn = 1000,      ' tiempo en ms
+    .RetrasoIn = 1000,     ' ms antes de iniciar fade in
     .Minusculas = True,
     .Rotacion = 0,
-    .FadeOut = 1000,
+    .FadeOut = 200,
     .Sombra = "3px 3px 6px black",
     .TextAlign = "right",   ' alineación dentro del recuadr
     .WhiteSpace = "nowrap"
@@ -206,6 +212,7 @@ Public Class Form2
 
 
         webForm.DLL_AgregarTexto(ultimoId, cfg2, True)
+
 
 
     End Sub
