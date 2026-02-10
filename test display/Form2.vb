@@ -28,7 +28,7 @@ Public Class Form2
         webForm.Top = 0
         webForm.Width = 1366
         webForm.Height = 768
-        webForm.ShowInTaskbar = True
+        webForm.ShowInTaskbar = False
         ComboBox1.SelectedIndex = 0
         ComboBox2.SelectedIndex = 0
 

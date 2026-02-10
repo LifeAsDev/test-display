@@ -853,11 +853,17 @@ function agregarTexto(id, opciones, replace) {
 	// 🌑 FADE IN / FADE OUT
 	// ---------------------------------------------------
 
-	elemento.style.opacity = "0";
-	setTimeout(() => {
+	if (RetrasoIn > 0 || FadeIn > 0) {
+		elemento.style.opacity = "0";
+		setTimeout(() => {
+			aplicarEfecto(elemento, Efecto, contenidoProcesado);
+			elemento.style.opacity = (Opacidad ?? 100) / 100;
+		}, RetrasoIn);
+	} else {
 		aplicarEfecto(elemento, Efecto, contenidoProcesado);
 		elemento.style.opacity = (Opacidad ?? 100) / 100;
-	}, RetrasoIn);
+	}
+
 	elemento.dataset.fadeOut = FadeOut;
 
 	// START FADE OUT
